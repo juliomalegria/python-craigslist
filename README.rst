@@ -9,20 +9,90 @@ Disclaimer
 ----------
 
 * I don't work for or have any affiliation with Craigslist.
-* This code should not be used for crawling or downloading data from Craigslist.
+* This module was implemented for educational purposes. It should not be used for crawling or downloading data from Craigslist.
 
-Classes
--------
+Installation
+------------
 
-* ``CraigslistCommunity``
-* ``CraigslistEvents``
-* ``CraigslistForSale``
-* ``CraigslistGigs``
-* ``CraigslistHousing``
-* ``CraigslistJobs``
-* ``CraigslistPersonals``
-* ``CraigslistResumes``
-* ``CraigslistServices``
+::
+
+    pip install python-craigslist
+
+Classes and its options
+-----------------------
+
+Base class:
+
+::
+
+    CraigslistBase
+    ├── query         (String)
+    ├── search_titles (True or False)
+    ├── has_image     (True or False)
+    └── posted_today  (True or False)
+
+Subclasses (include all base class options):
+
+::
+
+    CraigslistCommunity
+    └── $
+
+    CraigslistEvents
+    ├── art          (True of False)
+    ├── athletics    (True of False)
+    ├── career       (True of False)
+    ├── dance        (True of False)
+    ├── festival     (True of False)
+    ├── fitness      (True of False)
+    ├── health       (True of False)
+    ├── food         (True of False)
+    ├── drink        (True of False)
+    ├── free         (True of False)
+    ├── fundraiser   (True of False)
+    ├── tech         (True of False)
+    ├── kid_friendly (True of False)
+    ├── literacy     (True of False)
+    ├── music        (True of False)
+    ├── outdoor      (True of False)
+    ├── sale         (True of False)
+    └── singles      (True of False)
+
+    CraigslistForSale
+    ├── min_price (Number)
+    ├── max_price (Number)
+    ├── make      (String)
+    ├── model     (String)
+    ├── min_year  (Number)
+    ├── max_year  (Number)
+    ├── min_miles (Number)
+    └── max_miles (Number)
+
+    CraigslistGigs
+    └── is_paid (True of False)
+
+    CraigslistHousing
+    ├── private_room (True of False)
+    ├── private_bath (True of False)
+    ├── cats_ok      (True of False)
+    ├── dogs_ok      (True of False)
+    ├── min_price    (Number)
+    ├── max_price    (Number)
+    ├── min_ft2      (Number)
+    └── max_ft2      (Number)
+
+    CraigslistJobs
+    └── $
+
+    CraigslistPersonals
+    ├── min_age (Number)
+    └── max_age (Number)
+
+    CraigslistResumes
+    └── $
+
+    CraigslistServices
+    └── $
 
 Examples
 --------
