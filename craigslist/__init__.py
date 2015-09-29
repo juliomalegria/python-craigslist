@@ -1,12 +1,25 @@
+from __future__ import absolute_import
+
 from bs4 import BeautifulSoup
 import logging
-from Queue import Queue
+try:
+    #PY2
+    from queue import Queue
+except ImportError:
+    #PY3
+    from Queue import Queue
 import requests
 from requests.exceptions import RequestException
+from six import iteritems
 from threading import Thread
-from urlparse import urljoin
+try:
+    #PY2
+    from urlparse import urljoin
+except ImportError:
+    #PY3
+    from urllib.parse import urljoin
 
-from sites import get_all_sites
+from .sites import get_all_sites
 
 # Logging
 logger = logging.getLogger('python-craiglist')
@@ -85,7 +98,7 @@ class CraigslistBase(object):
                                    'category': self.category}
 
         self.filters = {}
-        for key, value in (filters or {}).iteritems():
+        for key, value in iteritems((filters or {})):
             try:
                 filter = self.base_filters.get(key) or self.extra_filters[key]
                 self.filters[filter['url_key']] = filter['value'] or value
