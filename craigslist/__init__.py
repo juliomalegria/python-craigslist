@@ -1,23 +1,17 @@
-from __future__ import absolute_import
-
 from bs4 import BeautifulSoup
 import logging
 try:
-    #PY2
-    from queue import Queue
+    from Queue import Queue  # PY2
 except ImportError:
-    #PY3
-    from Queue import Queue
+    from queue import Queue  # PY3
 import requests
 from requests.exceptions import RequestException
 from six import iteritems
 from threading import Thread
 try:
-    #PY2
-    from urlparse import urljoin
+    from urlparse import urljoin  # PY2
 except ImportError:
-    #PY3
-    from urllib.parse import urljoin
+    from urllib.parse import urljoin  # PY3
 
 from .sites import get_all_sites
 
