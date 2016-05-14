@@ -309,6 +309,8 @@ class CraigslistHousing(CraigslistBase):
         'max_price': {'url_key': 'maxAsk', 'value': None},
         'min_ft2': {'url_key': 'minSqft', 'value': None},
         'max_ft2': {'url_key': 'maxSqft', 'value': None},
+        'search_distance': {'url_key': 'search_distance', 'value': None},
+        'zip_code': {'url_key': 'postal', 'value': None},
     }
 
 
