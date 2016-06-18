@@ -13,7 +13,7 @@ def get_all_sites():
     for box in soup.findAll('div', {'class': 'box'}):
         for a in box.findAll('a'):
             # Remove protocol and get subdomain
-            site = a.attrs['href'].rsplit('//', 1)[1].split('.')[0]
+            site = a.attrs['href'].split('//')[1].split('.')[0]
             sites.add(site)
 
     return sites
