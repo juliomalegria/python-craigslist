@@ -15,14 +15,8 @@ except ImportError:
 
 from .sites import get_all_sites
 
-# Logging
-logger = logging.getLogger('python-craiglist')
-handler = logging.StreamHandler()
-logger.addHandler(handler)
-
-# Global
-all_sites = get_all_sites()  # All the Craiglist sites
-results_per_request = 100  # Craigslist returns 100 results per request
+ALL_SITES = get_all_sites()  # All the Craiglist sites
+RESULTS_PER_REQUEST = 100  # Craigslist returns 100 results per request
 
 
 def requests_get(*args, **kwargs):
@@ -31,10 +25,12 @@ def requests_get(*args, **kwargs):
     a timeout).
     """
 
+    logger = kwargs.pop('logger', None)
     try:
         return requests.get(*args, **kwargs)
     except RequestException as exc:
-        logger.warning('Request failed (%s). Retrying ...', exc)
+        if logger:
+            logger.warning('Request failed (%s). Retrying ...', exc)
         return requests.get(*args, **kwargs)
 
 
@@ -65,23 +61,24 @@ class CraigslistBase(object):
 
     def __init__(self, site='sfbay', area=None, category=None, filters=None,
                  log_level=logging.WARNING):
+        # Logging
+        self.set_logger(log_level, init=True)
 
-        self.set_logger(log_level)
-
-        if site not in all_sites:
+        if site not in ALL_SITES:
             msg = "'%s' is not a valid site" % site
-            logger.error(msg)
+            self.logger.error(msg)
             raise ValueError(msg)
         self.site = site
 
         if area:
             base_url = self.url_templates['base']
-            response = requests_get(base_url % {'site': self.site})
-            soup = BeautifulSoup(response.content, "html.parser")
+            response = requests_get(base_url % {'site': self.site},
+                                    logger=self.logger)
+            soup = BeautifulSoup(response.content, 'html.parser')
             sublinks = soup.find('ul', {'class': 'sublinks'})
             if not sublinks or not sublinks.find('a', text=area):
                 msg = "'%s' is not a valid area for site '%s'" % (area, site)
-                logger.error(msg)
+                self.logger.error(msg)
                 raise ValueError(msg)
         self.area = area
 
@@ -97,11 +94,15 @@ class CraigslistBase(object):
                 filter = self.base_filters.get(key) or self.extra_filters[key]
                 self.filters[filter['url_key']] = filter['value'] or value
             except KeyError:
-                logger.warning("'%s' is not a valid filter", key)
+                self.logger.warning("'%s' is not a valid filter", key)
 
-    def set_logger(self, log_level):
-        logger.setLevel(log_level)
-        handler.setLevel(log_level)
+    def set_logger(self, log_level, init=False):
+        if init:
+            self.logger = logging.getLogger('python-craiglist')
+            self.handler = logging.StreamHandler()
+            self.logger.addHandler(self.handler)
+        self.logger.setLevel(log_level)
+        self.handler.setLevel(log_level)
 
     def get_results(self, limit=None, sort_by=None, geotagged=False):
         """
@@ -117,7 +118,7 @@ class CraigslistBase(object):
             except KeyError:
                 msg = ("'%s' is not a valid sort_by option, "
                        "use: 'newest', 'price_asc' or 'price_desc'" % sort_by)
-                logger.error(msg)
+                self.logger.error(msg)
                 raise ValueError(msg)
 
         start = 0
@@ -126,12 +127,13 @@ class CraigslistBase(object):
 
         while True:
             self.filters['s'] = start
-            response = requests_get(self.url, params=self.filters)
-            logger.info('GET %s', response.url)
-            logger.info('Response code: %s', response.status_code)
+            response = requests_get(self.url, params=self.filters,
+                                    logger=self.logger)
+            self.logger.info('GET %s', response.url)
+            self.logger.info('Response code: %s', response.status_code)
             response.raise_for_status()  # Something failed?
 
-            soup = BeautifulSoup(response.content, "html.parser")
+            soup = BeautifulSoup(response.content, 'html.parser')
             if not total:
                 totalcount = soup.find('span', {'class': 'totalcount'})
                 total = int(totalcount.text) if totalcount else 0
@@ -139,8 +141,8 @@ class CraigslistBase(object):
             for row in soup.find_all('p', {'class': 'row'}):
                 if limit is not None and total_so_far >= limit:
                     break
-                logger.debug('Processing %s of %s results ...',
-                             total_so_far + 1, total)
+                self.logger.debug('Processing %s of %s results ...',
+                                  total_so_far + 1, total)
 
                 link = row.find('a', {'class': 'hdrlnk'})
                 id = link.attrs['data-id']
@@ -175,22 +177,22 @@ class CraigslistBase(object):
 
             if total_so_far == limit:
                 break
-            if (total_so_far - start) < results_per_request:
+            if (total_so_far - start) < RESULTS_PER_REQUEST:
                 break
             start = total_so_far
 
     def geotag_result(self, result):
         """ Adds (lat, lng) to result. """
 
-        logger.debug('Geotagging result ...')
+        self.logger.debug('Geotagging result ...')
 
         if result['has_map']:
-            response = requests_get(result['url'])
-            logger.info('GET %s', response.url)
-            logger.info('Response code: %s', response.status_code)
+            response = requests_get(result['url'], logger=self.logger)
+            self.logger.info('GET %s', response.url)
+            self.logger.info('Response code: %s', response.status_code)
 
             if response.ok:
-                soup = BeautifulSoup(response.content, "html.parser")
+                soup = BeautifulSoup(response.content, 'html.parser')
                 map = soup.find('div', {'id': 'map'})
                 if map:
                     result['geotag'] = (float(map.attrs['data-latitude']),
@@ -212,7 +214,8 @@ class CraigslistBase(object):
 
         def geotagger():
             while not queue.empty():
-                logger.debug('%s results left to geotag ...', queue.qsize())
+                self.logger.debug('%s results left to geotag ...',
+                                  queue.qsize())
                 self.geotag_result(queue.get())
                 queue.task_done()
 
