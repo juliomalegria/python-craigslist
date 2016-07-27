@@ -77,7 +77,7 @@ class CraigslistBase(object):
         if area:
             base_url = self.url_templates['base']
             response = requests_get(base_url % {'site': self.site})
-            soup = BeautifulSoup(response.content)
+            soup = BeautifulSoup(response.content, "html.parser")
             sublinks = soup.find('ul', {'class': 'sublinks'})
             if not sublinks or not sublinks.find('a', text=area):
                 msg = "'%s' is not a valid area for site '%s'" % (area, site)
@@ -131,7 +131,7 @@ class CraigslistBase(object):
             logger.info('Response code: %s', response.status_code)
             response.raise_for_status()  # Something failed?
 
-            soup = BeautifulSoup(response.content)
+            soup = BeautifulSoup(response.content, "html.parser")
             if not total:
                 totalcount = soup.find('span', {'class': 'totalcount'})
                 total = int(totalcount.text) if totalcount else 0
@@ -190,7 +190,7 @@ class CraigslistBase(object):
             logger.info('Response code: %s', response.status_code)
 
             if response.ok:
-                soup = BeautifulSoup(response.content)
+                soup = BeautifulSoup(response.content, "html.parser")
                 map = soup.find('div', {'id': 'map'})
                 if map:
                     result['geotag'] = (float(map.attrs['data-latitude']),
@@ -311,6 +311,10 @@ class CraigslistHousing(CraigslistBase):
         'max_ft2': {'url_key': 'maxSqft', 'value': None},
         'search_distance': {'url_key': 'search_distance', 'value': None},
         'zip_code': {'url_key': 'postal', 'value': None},
+        'bedrooms': {'url_key': 'bedrooms', 'value': None},
+        'bathrooms': {'url_key': 'bathrooms', 'value': None},
+        'laundry_in_unit': {'url_key': 'laundry', 'value': 1},
+        'no_smoking': {'url_key': 'no_smoking', 'value': 1},
     }
 
 
