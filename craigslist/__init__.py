@@ -34,6 +34,18 @@ def requests_get(*args, **kwargs):
         return requests.get(*args, **kwargs)
 
 
+def get_list_filters(url):
+    list_filters = {}
+    response = requests_get(url)
+    soup = BeautifulSoup(response.content, 'html.parser')
+    for list_filter in soup.find_all('div', {'class': 'attr_picker'}):
+        filter_key = list_filter.attrs['data-attr']
+        filter_labels = soup.find_all('label', {'data-attr': filter_key})
+        options = [opt.text.strip() for opt in filter_labels]
+        list_filters[filter_key] = {'url_key': filter_key, 'value': options}
+    return list_filters
+
+
 class CraigslistBase(object):
     """ Base class for all Craiglist wrappers. """
 
@@ -43,6 +55,7 @@ class CraigslistBase(object):
         'area': 'http://%(site)s.craigslist.org/search/%(area)s/%(category)s'
     }
 
+    default_site = 'sfbay'
     default_category = None
 
     base_filters = {
@@ -59,24 +72,19 @@ class CraigslistBase(object):
         'price_desc': 'pricedsc',
     }
 
-    def __init__(self, site='sfbay', area=None, category=None, filters=None,
+    def __init__(self, site=None, area=None, category=None, filters=None,
                  log_level=logging.WARNING):
         # Logging
         self.set_logger(log_level, init=True)
 
-        if site not in ALL_SITES:
-            msg = "'%s' is not a valid site" % site
+        self.site = site or self.default_site
+        if self.site not in ALL_SITES:
+            msg = "'%s' is not a valid site" % self.site
             self.logger.error(msg)
             raise ValueError(msg)
-        self.site = site
 
         if area:
-            base_url = self.url_templates['base']
-            response = requests_get(base_url % {'site': self.site},
-                                    logger=self.logger)
-            soup = BeautifulSoup(response.content, 'html.parser')
-            sublinks = soup.find('ul', {'class': 'sublinks'})
-            if not sublinks or not sublinks.find('a', text=area):
+            if not self.is_valid_area(area):
                 msg = "'%s' is not a valid area for site '%s'" % (area, site)
                 self.logger.error(msg)
                 raise ValueError(msg)
@@ -88,11 +96,32 @@ class CraigslistBase(object):
         self.url = url_template % {'site': self.site, 'area': self.area,
                                    'category': self.category}
 
+        list_filters = get_list_filters(self.url)
+
         self.filters = {}
         for key, value in iteritems((filters or {})):
             try:
-                filter = self.base_filters.get(key) or self.extra_filters[key]
-                self.filters[filter['url_key']] = filter['value'] or value
+                filter = (self.base_filters.get(key) or
+                          self.extra_filters.get(key) or
+                          list_filters[key])
+                if filter['value'] is None:
+                    self.filters[filter['url_key']] = value
+                if isinstance(filter['value'], list):
+                    valid_options = filter['value']
+                    if not hasattr(value, '__iter__'):
+                        value = [value]  # Force to list
+                    options = []
+                    for opt in value:
+                        try:
+                            options.append(valid_options.index(opt) + 1)
+                        except ValueError:
+                            self.logger.warning(
+                                "'%s' is not a valid option for %s"
+                                % (opt, key)
+                            )
+                    self.filters[filter['url_key']] = options
+                elif value:  # Don't add filter if ...=False
+                    self.filters[filter['url_key']] = filter['value']
             except KeyError:
                 self.logger.warning("'%s' is not a valid filter", key)
 
@@ -103,6 +132,14 @@ class CraigslistBase(object):
             self.logger.addHandler(self.handler)
         self.logger.setLevel(log_level)
         self.handler.setLevel(log_level)
+
+    def is_valid_area(self, area):
+        base_url = self.url_templates['base']
+        response = requests_get(base_url % {'site': self.site},
+                                logger=self.logger)
+        soup = BeautifulSoup(response.content, 'html.parser')
+        sublinks = soup.find('ul', {'class': 'sublinks'})
+        return sublinks and sublinks.find('a', text=area) is not None
 
     def get_results(self, limit=None, sort_by=None, geotagged=False):
         """
@@ -231,6 +268,23 @@ class CraigslistBase(object):
         for thread in threads:
             thread.join()
         return results
+
+    @classmethod
+    def show_filters(cls):
+        print 'Base filters:'
+        for key, options in iteritems(cls.base_filters):
+            value_as_str = '...' if options['value'] is None else 'True/False'
+            print '* %s = %s' % (key, value_as_str)
+        print 'Section specific filters:'
+        for key, options in iteritems(cls.extra_filters):
+            value_as_str = '...' if options['value'] is None else 'True/False'
+            print '* %s = %s' % (key, value_as_str)
+        url = cls.url_templates['no_area'] % {'site': cls.default_site,
+                                              'category': cls.default_category}
+        list_filters = get_list_filters(url)
+        for key, options in iteritems(list_filters):
+            value_as_str = ', '.join([repr(opt) for opt in options['value']])
+            print '* %s = %s' % (key, value_as_str)
 
 
 class CraigslistCommunity(CraigslistBase):

@@ -18,82 +18,53 @@ Installation
 
     pip install python-craigslist
 
-Classes and its options
------------------------
+Classes
+-------
 
 Base class:
 
 ::
 
     CraigslistBase
-    ├── query         (String)
-    ├── search_titles (True or False)
-    ├── has_image     (True or False)
-    └── posted_today  (True or False)
 
-Subclasses (include all base class options):
+Subclasses
 
 ::
 
     CraigslistCommunity
-    └── $
-
     CraigslistEvents
-    ├── art          (True of False)
-    ├── athletics    (True of False)
-    ├── career       (True of False)
-    ├── dance        (True of False)
-    ├── festival     (True of False)
-    ├── fitness      (True of False)
-    ├── health       (True of False)
-    ├── food         (True of False)
-    ├── drink        (True of False)
-    ├── free         (True of False)
-    ├── fundraiser   (True of False)
-    ├── tech         (True of False)
-    ├── kid_friendly (True of False)
-    ├── literacy     (True of False)
-    ├── music        (True of False)
-    ├── outdoor      (True of False)
-    ├── sale         (True of False)
-    └── singles      (True of False)
-
     CraigslistForSale
-    ├── min_price (Number)
-    ├── max_price (Number)
-    ├── make      (String)
-    ├── model     (String)
-    ├── min_year  (Number)
-    ├── max_year  (Number)
-    ├── min_miles (Number)
-    └── max_miles (Number)
-
     CraigslistGigs
-    └── is_paid (True of False)
-
     CraigslistHousing
-    ├── private_room (True of False)
-    ├── private_bath (True of False)
-    ├── cats_ok      (True of False)
-    ├── dogs_ok      (True of False)
-    ├── min_price    (Number)
-    ├── max_price    (Number)
-    ├── min_ft2      (Number)
-    └── max_ft2      (Number)
-
     CraigslistJobs
-    └── $
-
     CraigslistPersonals
-    ├── min_age (Number)
-    └── max_age (Number)
-
     CraigslistResumes
-    └── $
-
     CraigslistServices
-    └── $
 
+Usage
+-----
+
+To get a list of all filters accepted by a specific section (i.e. subclass),
+use the show_filters class method:
+
+.. code:: python
+
+   >>> from craigslist import Craigslist
+   >>> CraigslistJobs.show_filters()
+
+   Base filters:
+   * posted_today = True/False
+   * query = ...
+   * search_titles = True/False
+   * has_image = True/False
+   Section specific filters:
+   * is_internship = True/False
+   * is_telecommuting = True/False
+   * is_contract = True/False
+   * is_parttime = True/False
+   * is_nonprofit = True/False
+   * employment_type = u'full-time', u'part-time', u'contract', u"employee's choice"
+ 
 Examples
 --------
 
@@ -102,7 +73,6 @@ Looking for a room in San Francisco?
 .. code:: python
 
     from craigslist import CraigslistHousing
-
     cl_h = CraigslistHousing(site='sfbay', area='sfc', category='roo',
                              filters={'max_price': 1200, 'private_room': True})
 
@@ -122,12 +92,35 @@ Looking for a room in San Francisco?
     }
     # ...
 
-Everyone loves free food!
+Maybe an engineering internship in Silicon Valley?
+
+.. code:: python
+
+    from craigslist import CraigslistJobs
+    cl_j = CraigslistJobs(site='sfbay', area='sby', category='eng',
+                          filters={'is_internship': True, 'employment_type': ['full-time', 'part-time']})
+
+    for result in cl_j.get_results():
+        print result
+
+    {
+        'id': u'5708651182',
+        'name': u'GAME DEVELOPER INTERNSHIP AT TYNKER - AVAILABLE NOW!',
+	'url': u'http://sfbay.craigslist.org/pen/eng/5708651182.html',
+	'datetime': u'2016-07-30 13:30',
+	'price': None,
+	'where': u'mountain view',
+	'has_image': True,
+	'has_map': True,
+	'geotag': None
+    }
+    # ...
+
+Events with free food in New York?
 
 .. code:: python
 
     from craigslist import CraigslistEvents
-
     cl_e = CraigslistEvents(site='newyork', filters={'free': True, 'food': True})
 
     for result in cl_e.get_results(sort_by='newest', limit=5):
