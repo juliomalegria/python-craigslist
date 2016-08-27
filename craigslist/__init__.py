@@ -157,19 +157,22 @@ class CraigslistBase(object):
                     datetime = pl.text.split(':')[0].strip() if pl else None
                 price = row.find('span', {'class': 'price'})
                 where = row.find('small')
-                p_text = row.find('span', {'class': 'p'}).text
+                if where:
+                    where = where.text.strip()[1:-1]  # remove ()
+                p_span = row.find('span', {'class': 'p'})
+                p_text = p_span.text if p_span else ''
 
                 result = {'id': id,
                           'name': name,
                           'url': url,
                           'datetime': datetime,
                           'price': price.text if price else None,
-                          'where': where.text.strip('() ') if where else None,
+                          'where': where,
                           'has_image': 'pic' in p_text,
                           'has_map': 'map' in p_text,
                           'geotag': None}
 
-                if geotagged:
+                if geotagged and result['has_map']:
                     self.geotag_result(result)
 
                 yield result
