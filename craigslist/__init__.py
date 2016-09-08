@@ -106,7 +106,7 @@ class CraigslistBase(object):
                           list_filters[key])
                 if filter['value'] is None:
                     self.filters[filter['url_key']] = value
-                if isinstance(filter['value'], list):
+                elif isinstance(filter['value'], list):
                     valid_options = filter['value']
                     if not hasattr(value, '__iter__'):
                         value = [value]  # Force to list
@@ -148,7 +148,6 @@ class CraigslistBase(object):
         If geotagged=True, the results will include the (lat, lng) in the
         'geotag' attrib (this will make the process a little bit longer).
         """
-
         if sort_by:
             try:
                 self.filters['sort'] = self.sort_by_options[sort_by]
@@ -166,8 +165,10 @@ class CraigslistBase(object):
             self.filters['s'] = start
             response = requests_get(self.url, params=self.filters,
                                     logger=self.logger)
+
             self.logger.info('GET %s', response.url)
             self.logger.info('Response code: %s', response.status_code)
+            
             response.raise_for_status()  # Something failed?
 
             soup = BeautifulSoup(response.content, 'html.parser')
@@ -271,20 +272,20 @@ class CraigslistBase(object):
 
     @classmethod
     def show_filters(cls):
-        print 'Base filters:'
+        print('Base filters:')
         for key, options in iteritems(cls.base_filters):
             value_as_str = '...' if options['value'] is None else 'True/False'
-            print '* %s = %s' % (key, value_as_str)
-        print 'Section specific filters:'
+            print('* %s = %s' % (key, value_as_str))
+        print('Section specific filters:')
         for key, options in iteritems(cls.extra_filters):
             value_as_str = '...' if options['value'] is None else 'True/False'
-            print '* %s = %s' % (key, value_as_str)
+            print('* %s = %s' % (key, value_as_str))
         url = cls.url_templates['no_area'] % {'site': cls.default_site,
                                               'category': cls.default_category}
         list_filters = get_list_filters(url)
         for key, options in iteritems(list_filters):
             value_as_str = ', '.join([repr(opt) for opt in options['value']])
-            print '* %s = %s' % (key, value_as_str)
+            print('* %s = %s' % (key, value_as_str))
 
 
 class CraigslistCommunity(CraigslistBase):
