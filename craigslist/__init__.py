@@ -121,7 +121,7 @@ class CraigslistBase(object):
                             )
                     self.filters[filter['url_key']] = options
                 elif value:  # Don't add filter if ...=False
-                    print('{}={}'.format(filter['url_key'], filter['value']))
+                    self.filters[filter['url_key']] = filter['value']
             except KeyError:
                 self.logger.warning("'%s' is not a valid filter", key)
 
@@ -148,7 +148,6 @@ class CraigslistBase(object):
         If geotagged=True, the results will include the (lat, lng) in the
         'geotag' attrib (this will make the process a little bit longer).
         """
-
         if sort_by:
             try:
                 self.filters['sort'] = self.sort_by_options[sort_by]
@@ -166,9 +165,10 @@ class CraigslistBase(object):
             self.filters['s'] = start
             response = requests_get(self.url, params=self.filters,
                                     logger=self.logger)
-            print(response.url)
+
             self.logger.info('GET %s', response.url)
             self.logger.info('Response code: %s', response.status_code)
+            
             response.raise_for_status()  # Something failed?
 
             soup = BeautifulSoup(response.content, 'html.parser')
