@@ -106,7 +106,7 @@ class CraigslistBase(object):
                           list_filters[key])
                 if filter['value'] is None:
                     self.filters[filter['url_key']] = value
-                if isinstance(filter['value'], list):
+                elif isinstance(filter['value'], list):
                     valid_options = filter['value']
                     if not hasattr(value, '__iter__'):
                         value = [value]  # Force to list
@@ -121,7 +121,7 @@ class CraigslistBase(object):
                             )
                     self.filters[filter['url_key']] = options
                 elif value:  # Don't add filter if ...=False
-                    self.filters[filter['url_key']] = filter['value']
+                    print('{}={}'.format(filter['url_key'], filter['value']))
             except KeyError:
                 self.logger.warning("'%s' is not a valid filter", key)
 
@@ -166,6 +166,7 @@ class CraigslistBase(object):
             self.filters['s'] = start
             response = requests_get(self.url, params=self.filters,
                                     logger=self.logger)
+            print(response.url)
             self.logger.info('GET %s', response.url)
             self.logger.info('Response code: %s', response.status_code)
             response.raise_for_status()  # Something failed?
