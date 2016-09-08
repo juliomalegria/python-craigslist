@@ -271,20 +271,20 @@ class CraigslistBase(object):
 
     @classmethod
     def show_filters(cls):
-        print 'Base filters:'
+        print('Base filters:')
         for key, options in iteritems(cls.base_filters):
             value_as_str = '...' if options['value'] is None else 'True/False'
-            print '* %s = %s' % (key, value_as_str)
-        print 'Section specific filters:'
+            print('* %s = %s' % (key, value_as_str))
+        print('Section specific filters:')
         for key, options in iteritems(cls.extra_filters):
             value_as_str = '...' if options['value'] is None else 'True/False'
-            print '* %s = %s' % (key, value_as_str)
+            print('* %s = %s' % (key, value_as_str))
         url = cls.url_templates['no_area'] % {'site': cls.default_site,
                                               'category': cls.default_category}
         list_filters = get_list_filters(url)
         for key, options in iteritems(list_filters):
             value_as_str = ', '.join([repr(opt) for opt in options['value']])
-            print '* %s = %s' % (key, value_as_str)
+            print('* %s = %s' % (key, value_as_str))
 
 
 class CraigslistCommunity(CraigslistBase):
