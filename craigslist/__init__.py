@@ -66,6 +66,9 @@ class CraigslistBase(object):
     }
     extra_filters = {}
 
+    # Set to True to subclass defines the customize_results() method
+    custom_result_fields = False
+
     sort_by_options = {
         'newest': 'date',
         'price_asc': 'priceasc',
@@ -209,6 +212,9 @@ class CraigslistBase(object):
                           'has_map': 'map' in p_text,
                           'geotag': None}
 
+                if self.custom_result_fields:
+                    self.customize_result(result, row)
+
                 if geotagged and result['has_map']:
                     self.geotag_result(result)
 
@@ -220,6 +226,10 @@ class CraigslistBase(object):
             if (total_so_far - start) < RESULTS_PER_REQUEST:
                 break
             start = total_so_far
+
+    def customize_result(self, result, html_row):
+        """ Add custom/delete/alter fields to result. """
+        pass  # Override in subclass to add category-specific fields.
 
     def geotag_result(self, result):
         """ Adds (lat, lng) to result. """
