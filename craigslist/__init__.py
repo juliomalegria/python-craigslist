@@ -203,12 +203,23 @@ class CraigslistBase(object):
                     where = where.text.strip()[1:-1]  # remove ()
                 p_span = row.find('span', {'class': 'p'})
                 p_text = p_span.text if p_span else ''
+                bedsqft = row.find('span', {'class': 'housing'})
+                if bedsqft:
+                    if '-' in bedsqft.text:
+                        bedsqft = row.find('span', {'class': 'housing'}).text.split('-')
+                        beds = bedsqft[0].strip().replace('br','')
+                        sqft = bedsqft[1].strip().replace('ft2','')
+                else:
+                    beds = None
+                    sqft = None
 
                 result = {'id': id,
                           'name': name,
                           'url': url,
                           'datetime': datetime,
                           'price': price.text if price else None,
+                          'beds': beds or None,
+                          'sqft': sqft or None,
                           'where': where,
                           'has_image': 'pic' in p_text,
                           'has_map': 'map' in p_text,
