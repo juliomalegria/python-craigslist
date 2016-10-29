@@ -1,17 +1,19 @@
-from bs4 import BeautifulSoup
 import logging
 try:
     from Queue import Queue  # PY2
 except ImportError:
     from queue import Queue  # PY3
-import requests
-from requests.exceptions import RequestException
-from six import iteritems
 from threading import Thread
 try:
     from urlparse import urljoin  # PY2
 except ImportError:
     from urllib.parse import urljoin  # PY3
+
+from bs4 import BeautifulSoup
+import requests
+from requests.exceptions import RequestException
+from six import iteritems
+from six.moves import range
 
 from .sites import get_all_sites
 
@@ -270,7 +272,7 @@ class CraigslistBase(object):
                 queue.task_done()
 
         threads = []
-        for _ in xrange(workers):
+        for _ in range(workers):
             thread = Thread(target=geotagger)
             thread.start()
             threads.append(thread)
