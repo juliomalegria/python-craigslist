@@ -180,7 +180,7 @@ class CraigslistBase(object):
                 totalcount = soup.find('span', {'class': 'totalcount'})
                 total = int(totalcount.text) if totalcount else 0
 
-            for row in soup.find_all('p', {'class': 'row'}):
+            for row in soup.find_all('p', {'class': 'result-info'}):
                 if limit is not None and total_so_far >= limit:
                     break
                 self.logger.debug('Processing %s of %s results ...',
