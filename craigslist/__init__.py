@@ -180,7 +180,7 @@ class CraigslistBase(object):
                 totalcount = soup.find('span', {'class': 'totalcount'})
                 total = int(totalcount.text) if totalcount else 0
 
-            for row in soup.find_all('p', {'class': 'row'}):
+            for row in soup.find_all('p', {'class': 'result-info'}):
                 if limit is not None and total_so_far >= limit:
                     break
                 self.logger.debug('Processing %s of %s results ...',
@@ -197,12 +197,12 @@ class CraigslistBase(object):
                 else:
                     pl = row.find('span', {'class': 'pl'})
                     datetime = pl.text.split(':')[0].strip() if pl else None
-                price = row.find('span', {'class': 'price'})
-                where = row.find('small')
+                price = row.find('span', {'class': 'result-price'})
+                where = row.find('span', {'class': 'result-hood'})
                 if where:
                     where = where.text.strip()[1:-1]  # remove ()
-                p_span = row.find('span', {'class': 'p'})
-                p_text = p_span.text if p_span else ''
+                tags_span = row.find('span', {'class': 'result-tags'})
+                tags = tags_span.text if tags_span else ''
 
                 result = {'id': id,
                           'name': name,
@@ -210,8 +210,9 @@ class CraigslistBase(object):
                           'datetime': datetime,
                           'price': price.text if price else None,
                           'where': where,
-                          'has_image': 'pic' in p_text,
-                          'has_map': 'map' in p_text,
+                          'has_image': 'pic' in tags,
+                          # TODO: Look into this, looks like all shwo map now
+                          'has_map': 'map' in tags,
                           'geotag': None}
 
                 if self.custom_result_fields:
