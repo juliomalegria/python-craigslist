@@ -339,14 +339,14 @@ class CraigslistForSale(CraigslistBase):
     default_category = 'sss'
 
     extra_filters = {
-        'min_price': {'url_key': 'minAsk', 'value': None},
-        'max_price': {'url_key': 'maxAsk', 'value': None},
-        'make': {'url_key': 'autoMakeModel', 'value': None},
-        'model': {'url_key': 'autoMakeModel', 'value': None},
-        'min_year': {'url_key': 'autoMinYear', 'value': None},
-        'max_year': {'url_key': 'autoMaxYear', 'value': None},
-        'min_miles': {'url_key': 'autoMilesMin', 'value': None},
-        'max_miles': {'url_key': 'autoMilesMax', 'value': None},
+        'min_price': {'url_key': 'min_price', 'value': None},
+        'max_price': {'url_key': 'max_price', 'value': None},
+        'make': {'url_key': 'auto_make_model', 'value': None},
+        'model': {'url_key': 'auto_make_model', 'value': None},
+        'min_year': {'url_key': 'min_auto_year', 'value': None},
+        'max_year': {'url_key': 'max_auto_year', 'value': None},
+        'min_miles': {'url_key': 'min_auto_miles', 'value': None},
+        'max_miles': {'url_key': 'max_auto_miles', 'value': None},
     }
 
 
@@ -378,16 +378,17 @@ class CraigslistHousing(CraigslistBase):
         'private_bath': {'url_key': 'private_bath', 'value': 1},
         'cats_ok': {'url_key': 'pets_cat', 'value': 1},
         'dogs_ok': {'url_key': 'pets_dog', 'value': 1},
-        'min_price': {'url_key': 'minAsk', 'value': None},
-        'max_price': {'url_key': 'maxAsk', 'value': None},
+        'min_price': {'url_key': 'min_price', 'value': None},
+        'max_price': {'url_key': 'max_price', 'value': None},
         'min_ft2': {'url_key': 'minSqft', 'value': None},
         'max_ft2': {'url_key': 'maxSqft', 'value': None},
         'search_distance': {'url_key': 'search_distance', 'value': None},
         'zip_code': {'url_key': 'postal', 'value': None},
         'bedrooms': {'url_key': 'bedrooms', 'value': None},
         'bathrooms': {'url_key': 'bathrooms', 'value': None},
-        'laundry_in_unit': {'url_key': 'laundry', 'value': 1},
         'no_smoking': {'url_key': 'no_smoking', 'value': 1},
+        'is_furnished': {'url_key': 'is_furnished', 'value': 1},
+        'wheelchair_acccess': {'url_key': 'wheelchaccess', 'value': 1},
     }
 
 
@@ -397,10 +398,8 @@ class CraigslistJobs(CraigslistBase):
     default_category = 'jjj'
 
     extra_filters = {
-        'is_contract': {'url_key': 'is_contract', 'value': 1},
         'is_internship': {'url_key': 'is_internship', 'value': 1},
         'is_nonprofit': {'url_key': 'is_nonprofit', 'value': 1},
-        'is_parttime': {'url_key': 'is_parttime', 'value': 1},
         'is_telecommuting': {'url_key': 'is_telecommuting', 'value': 1},
     }
 
@@ -411,8 +410,8 @@ class CraigslistPersonals(CraigslistBase):
     default_category = 'ppp'
 
     extra_filters = {
-        'min_age': {'url_key': 'minAsk', 'value': None},
-        'max_age': {'url_key': 'maxAsk', 'value': None},
+        'min_age': {'url_key': 'min_pers_age', 'value': None},
+        'max_age': {'url_key': 'max_pers_age', 'value': None},
     }
 
 
