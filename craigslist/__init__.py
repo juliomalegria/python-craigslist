@@ -347,6 +347,8 @@ class CraigslistForSale(CraigslistBase):
         'max_year': {'url_key': 'max_auto_year', 'value': None},
         'min_miles': {'url_key': 'min_auto_miles', 'value': None},
         'max_miles': {'url_key': 'max_auto_miles', 'value': None},
+        'manual_transmission': {'url_key': 'auto_transmission', 'value': 1},
+        'clean_title': {'url_key': 'auto_title_status', 'value': 1},
     }
 
 
