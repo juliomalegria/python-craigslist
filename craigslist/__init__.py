@@ -40,9 +40,9 @@ def get_list_filters(url):
     list_filters = {}
     response = requests_get(url)
     soup = BeautifulSoup(response.content, 'html.parser')
-    for list_filter in soup.find_all('div', {'class': 'attr_picker'}):
+    for list_filter in soup.find_all('div', class_='search-attribute'):
         filter_key = list_filter.attrs['data-attr']
-        filter_labels = soup.find_all('label', {'data-attr': filter_key})
+        filter_labels = list_filter.find_all('label')
         options = [opt.text.strip() for opt in filter_labels]
         list_filters[filter_key] = {'url_key': filter_key, 'value': options}
     return list_filters
