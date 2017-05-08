@@ -380,6 +380,8 @@ class CraigslistHousing(CraigslistBase):
         'dogs_ok': {'url_key': 'pets_dog', 'value': 1},
         'min_price': {'url_key': 'min_price', 'value': None},
         'max_price': {'url_key': 'max_price', 'value': None},
+        'min_bedrooms': {'url_key': 'min_bedrooms', 'value': None},
+        'min_bathrooms': {'url_key': 'min_bathrooms', 'value': None},
         'min_ft2': {'url_key': 'minSqft', 'value': None},
         'max_ft2': {'url_key': 'maxSqft', 'value': None},
         'search_distance': {'url_key': 'search_distance', 'value': None},
