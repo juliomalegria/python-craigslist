@@ -65,6 +65,8 @@ class CraigslistBase(object):
         'search_titles': {'url_key': 'srchType', 'value': 'T'},
         'has_image': {'url_key': 'hasPic', 'value': 1},
         'posted_today': {'url_key': 'postedToday', 'value': 1},
+        'cats': {'url_key': 'pets_cat', 'value': 1},
+        'dogs': {'url_key': 'pets_dog', 'value': 1},
     }
     extra_filters = {}
 
