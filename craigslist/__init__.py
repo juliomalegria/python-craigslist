@@ -152,7 +152,8 @@ class CraigslistBase(object):
         sublinks = soup.find('ul', {'class': 'sublinks'})
         return sublinks and sublinks.find('a', text=area) is not None
 
-    def get_results(self, limit=None, start=0, sort_by=None, geotagged=False):
+    def get_results(self, limit=None, start=0, sort_by=None, geotagged=False,
+                    include_details=False):
         """
         Get results from Craigslist based on the specified filters.
 
@@ -224,8 +225,12 @@ class CraigslistBase(object):
                 if self.custom_result_fields:
                     self.customize_result(result, row)
 
-                if geotagged and result['has_map']:
-                    self.geotag_result(result)
+                if (geotagged and result['has_map']) or include_details:
+                    detail_soup = self.fetch_content(result['url'])
+                    if geotagged and result['has_map']:
+                        self.geotag_result(result, detail_soup)
+                    if include_details:
+                        self.include_details(result, detail_soup)
 
                 yield result
                 results_yielded += 1
@@ -241,24 +246,44 @@ class CraigslistBase(object):
         """ Add custom/delete/alter fields to result. """
         pass  # Override in subclass to add category-specific fields.
 
-    def geotag_result(self, result):
+    def geotag_result(self, result, soup):
         """ Adds (lat, lng) to result. """
 
         self.logger.debug('Geotagging result ...')
 
-        if result['has_map']:
-            response = requests_get(result['url'], logger=self.logger)
-            self.logger.info('GET %s', response.url)
-            self.logger.info('Response code: %s', response.status_code)
-
-            if response.ok:
-                soup = bs(response.content)
-                map = soup.find('div', {'id': 'map'})
-                if map:
-                    result['geotag'] = (float(map.attrs['data-latitude']),
-                                        float(map.attrs['data-longitude']))
+        map = soup.find('div', {'id': 'map'})
+        if map:
+            result['geotag'] = (float(map.attrs['data-latitude']),
+                                float(map.attrs['data-longitude']))
 
         return result
+
+    def include_details(self, result, soup):
+        """ Adds description, images to result """
+
+        self.logger.debug('Adding details to result...')
+
+        body = soup.find('section', {'id': 'postingbody'})
+        result['body'] = body.text.strip()
+
+        image_tags = soup.find_all('img')
+        images = []
+        # the first image is always a repeat, skip it
+        for img in image_tags[1:]:
+            img_link = img['src'].replace('50x50c', '600x450')
+            images.append(img_link)
+
+        result['images'] = images
+
+    def fetch_content(self, url):
+        response = requests_get(url, logger=self.logger)
+        self.logger.info('GET %s', response.url)
+        self.logger.info('Response code: %s', response.status_code)
+
+        if response.ok:
+            return bs(response.content)
+
+        return None
 
     def geotag_results(self, results, workers=8):
         """
