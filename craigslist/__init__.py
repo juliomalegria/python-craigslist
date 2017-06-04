@@ -21,6 +21,10 @@ ALL_SITES = get_all_sites()  # All the Craiglist sites
 RESULTS_PER_REQUEST = 100  # Craigslist returns 100 results per request
 
 
+def bs(content):
+    return BeautifulSoup(content, 'html.parser')
+
+
 def requests_get(*args, **kwargs):
     """
     Retries if a RequestException is raised (could be a connection error or
@@ -39,7 +43,7 @@ def requests_get(*args, **kwargs):
 def get_list_filters(url):
     list_filters = {}
     response = requests_get(url)
-    soup = BeautifulSoup(response.content, 'html.parser')
+    soup = bs(response.content)
     for list_filter in soup.find_all('div', class_='search-attribute'):
         filter_key = list_filter.attrs['data-attr']
         filter_labels = list_filter.find_all('label')
@@ -144,7 +148,7 @@ class CraigslistBase(object):
         base_url = self.url_templates['base']
         response = requests_get(base_url % {'site': self.site},
                                 logger=self.logger)
-        soup = BeautifulSoup(response.content, 'html.parser')
+        soup = bs(response.content)
         sublinks = soup.find('ul', {'class': 'sublinks'})
         return sublinks and sublinks.find('a', text=area) is not None
 
@@ -177,7 +181,7 @@ class CraigslistBase(object):
             self.logger.info('Response code: %s', response.status_code)
             response.raise_for_status()  # Something failed?
 
-            soup = BeautifulSoup(response.content, 'html.parser')
+            soup = bs(response.content)
             if not total:
                 totalcount = soup.find('span', {'class': 'totalcount'})
                 total = int(totalcount.text) if totalcount else 0
@@ -248,7 +252,7 @@ class CraigslistBase(object):
             self.logger.info('Response code: %s', response.status_code)
 
             if response.ok:
-                soup = BeautifulSoup(response.content, 'html.parser')
+                soup = bs(response.content)
                 map = soup.find('div', {'id': 'map'})
                 if map:
                     result['geotag'] = (float(map.attrs['data-latitude']),
