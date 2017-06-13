@@ -65,6 +65,8 @@ class CraigslistBase(object):
         'search_titles': {'url_key': 'srchType', 'value': 'T'},
         'has_image': {'url_key': 'hasPic', 'value': 1},
         'posted_today': {'url_key': 'postedToday', 'value': 1},
+        'search_distance': {'url_key': 'searchDistance', 'value': 1},
+        'postal': {'url_key': 'postal', 'value': None},
     }
     extra_filters = {}
 
@@ -146,7 +148,7 @@ class CraigslistBase(object):
         sublinks = soup.find('ul', {'class': 'sublinks'})
         return sublinks and sublinks.find('a', text=area) is not None
 
-    def get_results(self, limit=None, sort_by=None, geotagged=False):
+    def get_results(self, start=0, limit=None, sort_by=None, geotagged=False):
         """
         Get results from Craigslist based on the specified filters.
 
@@ -163,7 +165,6 @@ class CraigslistBase(object):
                 self.logger.error(msg)
                 raise ValueError(msg)
 
-        start = 0
         total_so_far = 0
         total = 0
 
