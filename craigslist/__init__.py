@@ -148,7 +148,7 @@ class CraigslistBase(object):
         sublinks = soup.find('ul', {'class': 'sublinks'})
         return sublinks and sublinks.find('a', text=area) is not None
 
-    def get_results(self, limit=None, sort_by=None, geotagged=False):
+    def get_results(self, limit=None, start=0, sort_by=None, geotagged=False):
         """
         Get results from Craigslist based on the specified filters.
 
@@ -165,8 +165,8 @@ class CraigslistBase(object):
                 self.logger.error(msg)
                 raise ValueError(msg)
 
-        start = 0
-        total_so_far = 0
+        total_so_far = start
+        results_yielded = 0
         total = 0
 
         while True:
@@ -183,7 +183,7 @@ class CraigslistBase(object):
                 total = int(totalcount.text) if totalcount else 0
 
             for row in soup.find_all('p', {'class': 'result-info'}):
-                if limit is not None and total_so_far >= limit:
+                if limit is not None and results_yielded >= limit:
                     break
                 self.logger.debug('Processing %s of %s results ...',
                                   total_so_far + 1, total)
@@ -224,9 +224,10 @@ class CraigslistBase(object):
                     self.geotag_result(result)
 
                 yield result
+                results_yielded += 1
                 total_so_far += 1
 
-            if total_so_far == limit:
+            if results_yielded == limit:
                 break
             if (total_so_far - start) < RESULTS_PER_REQUEST:
                 break
