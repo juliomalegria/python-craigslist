@@ -211,7 +211,7 @@ class CraigslistBase(object):
                           'price': price.text if price else None,
                           'where': where,
                           'has_image': 'pic' in tags,
-                          # TODO: Look into this, looks like all shwo map now
+                          # TODO: Look into this, looks like all show map now
                           'has_map': 'map' in tags,
                           'geotag': None}
 
@@ -374,6 +374,7 @@ class CraigslistHousing(CraigslistBase):
     """ Craigslist housing wrapper. """
 
     default_category = 'hhh'
+    custom_result_fields = True
 
     extra_filters = {
         'private_room': {'url_key': 'private_room', 'value': 1},
@@ -394,6 +395,19 @@ class CraigslistHousing(CraigslistBase):
         'is_furnished': {'url_key': 'is_furnished', 'value': 1},
         'wheelchair_acccess': {'url_key': 'wheelchaccess', 'value': 1},
     }
+
+    def customize_result(self, result, html_row):
+        housing_info = html_row.find('span', {'class': 'housing'})
+        # Default values
+        result.update({'bedrooms': None, 'area': None})
+        if housing_info:
+            for elem in housing_info.text.split('-'):
+                elem = elem.strip()
+                if elem.endswith('br'):
+                    # Don't convert to int, too risky
+                    result['bedrooms'] = elem[:-2]
+                if elem.endswith('2'):
+                    result['area'] = elem
 
 
 class CraigslistJobs(CraigslistBase):
