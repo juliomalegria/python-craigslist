@@ -17,3 +17,12 @@ def get_all_sites():
             sites.add(site)
 
     return sites
+
+def get_all_areas(site):
+    site_url = 'http://%s.craigslist.org/' % (site)
+    response = requests.get(site_url)
+    response.raise_for_status()  # Something failed?
+    soup = BeautifulSoup(response.content, 'html.parser')
+    raw = soup.select('ul.sublinks li a')
+    sites = set([a.attrs['href'].rsplit('/')[1] for a in raw])
+    return sites
