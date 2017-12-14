@@ -105,7 +105,12 @@ class CraigslistBase(object):
 
         list_filters = get_list_filters(self.url)
 
-        self.filters = {}
+        # If a search has few results, results for "similar listings" will
+        # showed. The solution is a bit counter-intuitive, but to force this
+        # not to happen, we set searchNearby=True, but not pass any
+        # nearbyArea=X, thus showing no similar listings.
+        self.filters = {'searchNearby': 1}
+
         for key, value in iteritems((filters or {})):
             try:
                 filter = (self.base_filters.get(key) or
