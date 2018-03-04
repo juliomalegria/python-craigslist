@@ -69,6 +69,7 @@ class CraigslistBase(object):
         'search_titles': {'url_key': 'srchType', 'value': 'T'},
         'has_image': {'url_key': 'hasPic', 'value': 1},
         'posted_today': {'url_key': 'postedToday', 'value': 1},
+        'bundle_duplicates': {'url_key': 'bundleDuplicates', 'value': 1},
         'search_distance': {'url_key': 'search_distance', 'value': None},
         'zip_code': {'url_key': 'postal', 'value': None},
     }
@@ -192,7 +193,9 @@ class CraigslistBase(object):
                 totalcount = soup.find('span', {'class': 'totalcount'})
                 total = int(totalcount.text) if totalcount else 0
 
-            for row in soup.find_all('li', {'class': 'result-row'}):
+            rows = soup.find('ul', {'class': 'rows'})
+            for row in rows.find_all('li', {'class': 'result-row'},
+                                     recursive=False):
                 if limit is not None and results_yielded >= limit:
                     break
                 self.logger.debug('Processing %s of %s results ...',
