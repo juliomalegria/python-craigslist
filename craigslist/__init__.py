@@ -192,14 +192,16 @@ class CraigslistBase(object):
                 totalcount = soup.find('span', {'class': 'totalcount'})
                 total = int(totalcount.text) if totalcount else 0
 
-            for row in soup.find_all('p', {'class': 'result-info'}):
+            for row in soup.find_all('li', {'class': 'result-row'}):
                 if limit is not None and results_yielded >= limit:
                     break
                 self.logger.debug('Processing %s of %s results ...',
                                   total_so_far + 1, total)
 
+                id = row.attrs['data-pid']
+                repost_of = row.attrs.get('data-repost-of')
+
                 link = row.find('a', {'class': 'hdrlnk'})
-                id = link.attrs['data-id']
                 name = link.text
                 url = urljoin(self.url, link.attrs['href'])
 
@@ -217,6 +219,7 @@ class CraigslistBase(object):
                 tags = tags_span.text if tags_span else ''
 
                 result = {'id': id,
+                          'repost_of': repost_of,
                           'name': name,
                           'url': url,
                           'datetime': datetime,
