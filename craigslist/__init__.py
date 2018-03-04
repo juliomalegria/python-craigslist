@@ -268,13 +268,19 @@ class CraigslistBase(object):
 
         self.logger.debug('Adding details to result...')
 
-        body = soup.find('section', {'id': 'postingbody'})
-        result['body'] = body.text.strip()
+        body = soup.find('section', id='postingbody')
+        # We need to massage the data a little bit because it might include
+        # some inner elements that we want to ignore.
+        body_text = (getattr(e, 'text', e) for e in body
+                     if not getattr(e, 'attrs', None))
+        result['body'] = ''.join(body_text).strip()
 
         image_tags = soup.find_all('img')
+        # If there's more than one picture, the first one will be repeated.
+        image_tags = image_tags[1:] if len(image_tags) > 1 else image_tags
+
         images = []
-        # the first image is always a repeat, skip it
-        for img in image_tags[1:]:
+        for img in image_tags:
             img_link = img['src'].replace('50x50c', '600x450')
             images.append(img_link)
 
