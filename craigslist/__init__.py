@@ -14,6 +14,7 @@ import requests
 from requests.exceptions import RequestException
 from six import iteritems
 from six.moves import range
+import re
 
 from .sites import get_all_sites
 
@@ -236,12 +237,20 @@ class CraigslistBase(object):
                 if self.custom_result_fields:
                     self.customize_result(result, row)
 
-                if (geotagged and result['has_map']) or include_details:
+                include_bathrooms = False
+                if isinstance(self, CraigslistHousing):
+                    include_bathrooms = True
+
+                if (geotagged and result['has_map']) or include_details or \
+                   include_bathrooms:
+
                     detail_soup = self.fetch_content(result['url'])
                     if geotagged and result['has_map']:
                         self.geotag_result(result, detail_soup)
                     if include_details:
                         self.include_details(result, detail_soup)
+                    if include_bathrooms:
+                        self.include_bathrooms(result, detail_soup)
 
                 yield result
                 results_yielded += 1
@@ -291,6 +300,22 @@ class CraigslistBase(object):
             images.append(img_link)
 
         result['images'] = images
+
+    def include_bathrooms(self, result, soup):
+        """ Adds bathroom count to result """
+
+        result['bathrooms'] = None
+
+        mapAndAttrs = soup.find('div', 'mapAndAttrs')
+
+        if mapAndAttrs:
+            attrgroup = mapAndAttrs.find('p', 'attrgroup')
+
+            if attrgroup:
+                bedroom_bathroom = attrgroup.find('span', 'shared-line-bubble').text
+                if 'Ba' in bedroom_bathroom:
+                    r = re.findall(r'(\d+)Ba', bedroom_bathroom)
+                    result['bathrooms'] = r[0] if r else None
 
     def fetch_content(self, url):
         response = requests_get(url, logger=self.logger)
