@@ -314,7 +314,7 @@ class CraigslistBase(object):
             if attrgroup:
                 bedroom_bathroom = attrgroup.find('span', 'shared-line-bubble').text
                 if 'Ba' in bedroom_bathroom:
-                    r = re.findall(r'(\d*\.\d+|\d+)Ba', bedroom_bathroom)
+                    r = re.findall(r'(\S+)Ba', bedroom_bathroom)
                     result['bathrooms'] = r[0] if r else None
 
     def fetch_content(self, url):
