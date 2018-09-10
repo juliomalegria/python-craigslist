@@ -86,7 +86,24 @@ supported by a specific subclass, use the ``.show_filters()`` class-method:
    * auto_size = u'compact', u'full-size', u'mid-size', u'sub-compact'
    * auto_cylinders = u'3 cylinders', u'4 cylinders', u'5 cylinders', u'6 cylinders', u'8 cylinders', u'10 cylinders', u'12 cylinders', u'other'
    * condition = u'new', u'like new', u'excellent', u'good', u'fair', u'salvage'
- 
+
+Where to get ``site`` and ``area`` from?
+----------------------------------------
+
+When initializing any of the subclasses, you'll need to provide the ``site``, and optionall the ``area``, from where you want to query data.
+
+To get the right ``site``, follow these steps:
+
+1. Go to `craigslist.org/about/sites <https://www.craigslist.org/about/sites>`__.
+2. Find the country or city you're interested on, and click on it.
+3. You'll be directed to ``<site>.craigslist.org``. The value of ``<site>`` in the URL is the one you should use.
+
+Not all sites have areas. To check if your site has areas, check for links next to the title of the Craigslist page, on the top center. For example, for New York you'll see:
+
+.. image:: https://user-images.githubusercontent.com/1008637/45307206-bb404d80-b51e-11e8-8e6d-edfbdbd0a6fa.png
+
+Click on the one you're interested, and you'll be redirected to ``<site>.craigslist.org/<area>``. The value of ``<area>`` in the URL is the one you should use. If there are no areas next to the title, it means your site has no areas, and you can leave that argument unset.
+
 Examples
 --------
 
