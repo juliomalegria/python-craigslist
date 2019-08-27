@@ -143,12 +143,12 @@ Looking for a room in San Francisco?
     }
     # ...
 
-Maybe an engineering internship in Silicon Valley?
+Maybe an software engineering internship in Silicon Valley?
 
 .. code:: python
 
     from craigslist import CraigslistJobs
-    cl_j = CraigslistJobs(site='sfbay', area='sby', category='eng',
+    cl_j = CraigslistJobs(site='sfbay', area='sby', category='sof',
                           filters={'is_internship': True, 'employment_type': ['full-time', 'part-time']})
 
     for result in cl_j.get_results():
