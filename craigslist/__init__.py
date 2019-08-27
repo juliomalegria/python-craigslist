@@ -229,16 +229,14 @@ class CraigslistBase(object):
                           'price': price.text if price else None,
                           'where': where,
                           'has_image': 'pic' in tags,
-                          # TODO: Look into this, looks like all show map now
-                          'has_map': 'map' in tags,
                           'geotag': None}
 
                 if self.custom_result_fields:
                     self.customize_result(result, row)
 
-                if (geotagged and result['has_map']) or include_details:
+                if geotagged or include_details:
                     detail_soup = self.fetch_content(result['url'])
-                    if geotagged and result['has_map']:
+                    if geotagged:
                         self.geotag_result(result, detail_soup)
                     if include_details:
                         self.include_details(result, detail_soup)
