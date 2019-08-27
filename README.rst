@@ -104,7 +104,7 @@ Not all sites have areas. To check if your site has areas, check for links next 
 
 Click on the one you're interested, and you'll be redirected to ``<site>.craigslist.org/<area>``. The value of ``<area>`` in the URL is the one you should use. If there are no areas next to the title, it means your site has no areas, and you can leave that argument unset.
 
-Where to get `category`` from?
+Where to get ``category`` from?
 ------------------------------
 
 You can additionally provide a ``category`` when initializing any of the subclasses. To obtain the code of this ``category``, follow these steps:
