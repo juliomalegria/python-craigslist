@@ -104,6 +104,18 @@ Not all sites have areas. To check if your site has areas, check for links next 
 
 Click on the one you're interested, and you'll be redirected to ``<site>.craigslist.org/<area>``. The value of ``<area>`` in the URL is the one you should use. If there are no areas next to the title, it means your site has no areas, and you can leave that argument unset.
 
+Where to get `category`` from?
+------------------------------
+
+You can additionally provide a ``category`` when initializing any of the subclasses. To obtain the code of this ``category``, follow these steps:
+
+1. Go to ``<site>.craigslist.org`` or just `craigslist.org <https://www.craigslist.org>`__ (you'll be directed to the last used ``site``).
+2. You'll see a list of categories and subcategories (see image below).
+3. Click on the interested subcategory. You'll be redirected to the search view for that subcategory. The URL you were redirected will end with ``/search/<category>``. This would be the code for your category.
+
+.. image:: https://user-images.githubusercontent.com/14173022/46252889-3614ce00-c424-11e8-9bac-060c236b8b58.png
+
+
 Examples
 --------
 
