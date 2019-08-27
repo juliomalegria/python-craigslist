@@ -225,7 +225,10 @@ class CraigslistBase(object):
                           'repost_of': repost_of,
                           'name': name,
                           'url': url,
+                          # NOTE: Keeping 'datetime' for backwards
+                          # compatibility, use 'last_updated' instead.
                           'datetime': datetime,
+                          'last_updated': datetime,
                           'price': price.text if price else None,
                           'where': where,
                           'has_image': 'pic' in tags,
@@ -278,6 +281,18 @@ class CraigslistBase(object):
         body_text = (getattr(e, 'text', e) for e in body
                      if not getattr(e, 'attrs', None))
         result['body'] = ''.join(body_text).strip()
+
+        # Add created time (in case it's different from last updated).
+        postinginfos = soup.find('div', {'class': 'postinginfos'})
+        for p in postinginfos.find_all('p'):
+            if 'posted' in p.text:
+                time = p.find('time')
+                if time:
+                    # This date is in ISO format. I'm removing the T literal
+                    # and the timezone to make it the same format as
+                    # 'last_updated'.
+                    created = time.attrs['datetime'].replace('T', ' ')
+                    result['created'] = created.rsplit(':', 1)[0]
 
         image_tags = soup.find_all('img')
         # If there's more than one picture, the first one will be repeated.
