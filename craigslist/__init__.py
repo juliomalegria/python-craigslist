@@ -9,47 +9,13 @@ try:
 except ImportError:
     from urllib.parse import urljoin  # PY3
 
-from bs4 import BeautifulSoup
-import requests
-from requests.exceptions import RequestException
 from six import iteritems
 from six.moves import range
 
-from .sites import get_all_sites
+from .utils import bs, requests_get, get_all_sites, get_list_filters
 
 ALL_SITES = get_all_sites()  # All the Craiglist sites
 RESULTS_PER_REQUEST = 100  # Craigslist returns 100 results per request
-
-
-def bs(content):
-    return BeautifulSoup(content, 'html.parser')
-
-
-def requests_get(*args, **kwargs):
-    """
-    Retries if a RequestException is raised (could be a connection error or
-    a timeout).
-    """
-
-    logger = kwargs.pop('logger', None)
-    try:
-        return requests.get(*args, **kwargs)
-    except RequestException as exc:
-        if logger:
-            logger.warning('Request failed (%s). Retrying ...', exc)
-        return requests.get(*args, **kwargs)
-
-
-def get_list_filters(url):
-    list_filters = {}
-    response = requests_get(url)
-    soup = bs(response.content)
-    for list_filter in soup.find_all('div', class_='search-attribute'):
-        filter_key = list_filter.attrs['data-attr']
-        filter_labels = list_filter.find_all('label')
-        options = [opt.text.strip() for opt in filter_labels]
-        list_filters[filter_key] = {'url_key': filter_key, 'value': options}
-    return list_filters
 
 
 class CraigslistBase(object):
