@@ -74,23 +74,28 @@ class CraigslistBase(object):
         self.url = url_template % {'site': self.site, 'area': self.area,
                                    'category': self.category}
 
+        self.filters = self.get_filters(filters)
+
+    def get_filters(self, filters):
+        """Parses filters passed by the user into GET parameters."""
+
         list_filters = get_list_filters(self.url)
 
-        # If a search has few results, results for "similar listings" will
-        # showed. The solution is a bit counter-intuitive, but to force this
+        # If a search has few results, results for "similar listings" will be
+        # included. The solution is a bit counter-intuitive, but to force this
         # not to happen, we set searchNearby=True, but not pass any
         # nearbyArea=X, thus showing no similar listings.
-        self.filters = {'searchNearby': 1}
+        parsed_filters = {'searchNearby': 1}
 
         for key, value in iteritems((filters or {})):
             try:
-                filter = (self.base_filters.get(key) or
-                          self.extra_filters.get(key) or
-                          list_filters[key])
-                if filter['value'] is None:
-                    self.filters[filter['url_key']] = value
-                elif isinstance(filter['value'], list):
-                    valid_options = filter['value']
+                filter_ = (self.base_filters.get(key) or
+                           self.extra_filters.get(key) or
+                           list_filters[key])
+                if filter_['value'] is None:
+                    parsed_filters[filter_['url_key']] = value
+                elif isinstance(filter_['value'], list):
+                    valid_options = filter_['value']
                     if not hasattr(value, '__iter__'):
                         value = [value]  # Force to list
                     options = []
@@ -102,11 +107,13 @@ class CraigslistBase(object):
                                 "'%s' is not a valid option for %s"
                                 % (opt, key)
                             )
-                    self.filters[filter['url_key']] = options
+                    parsed_filters[filter_['url_key']] = options
                 elif value:  # Don't add filter if ...=False
-                    self.filters[filter['url_key']] = filter['value']
+                    parsed_filters[filter_['url_key']] = filter_['value']
             except KeyError:
                 self.logger.warning("'%s' is not a valid filter", key)
+
+        return parsed_filters
 
     def set_logger(self, log_level, init=False):
         if init:
@@ -127,7 +134,7 @@ class CraigslistBase(object):
     def get_results(self, limit=None, start=0, sort_by=None, geotagged=False,
                     include_details=False):
         """
-        Get results from Craigslist based on the specified filters.
+        Gets results from Craigslist based on the specified filters.
 
         If geotagged=True, the results will include the (lat, lng) in the
         'geotag' attrib (this will make the process a little bit longer).
@@ -167,50 +174,8 @@ class CraigslistBase(object):
                 self.logger.debug('Processing %s of %s results ...',
                                   total_so_far + 1, total)
 
-                id = row.attrs['data-pid']
-                repost_of = row.attrs.get('data-repost-of')
+                yield self.process_row(row, geotagged, include_details)
 
-                link = row.find('a', {'class': 'hdrlnk'})
-                name = link.text
-                url = urljoin(self.url, link.attrs['href'])
-
-                time = row.find('time')
-                if time:
-                    datetime = time.attrs['datetime']
-                else:
-                    pl = row.find('span', {'class': 'pl'})
-                    datetime = pl.text.split(':')[0].strip() if pl else None
-                price = row.find('span', {'class': 'result-price'})
-                where = row.find('span', {'class': 'result-hood'})
-                if where:
-                    where = where.text.strip()[1:-1]  # remove ()
-                tags_span = row.find('span', {'class': 'result-tags'})
-                tags = tags_span.text if tags_span else ''
-
-                result = {'id': id,
-                          'repost_of': repost_of,
-                          'name': name,
-                          'url': url,
-                          # NOTE: Keeping 'datetime' for backwards
-                          # compatibility, use 'last_updated' instead.
-                          'datetime': datetime,
-                          'last_updated': datetime,
-                          'price': price.text if price else None,
-                          'where': where,
-                          'has_image': 'pic' in tags,
-                          'geotag': None}
-
-                if self.custom_result_fields:
-                    self.customize_result(result, row)
-
-                if geotagged or include_details:
-                    detail_soup = self.fetch_content(result['url'])
-                    if geotagged:
-                        self.geotag_result(result, detail_soup)
-                    if include_details:
-                        self.include_details(result, detail_soup)
-
-                yield result
                 results_yielded += 1
                 total_so_far += 1
 
@@ -220,8 +185,54 @@ class CraigslistBase(object):
                 break
             start = total_so_far
 
+    def process_row(self, row, geotagged=False, include_details=False):
+        id = row.attrs['data-pid']
+        repost_of = row.attrs.get('data-repost-of')
+
+        link = row.find('a', {'class': 'hdrlnk'})
+        name = link.text
+        url = urljoin(self.url, link.attrs['href'])
+
+        time = row.find('time')
+        if time:
+            datetime = time.attrs['datetime']
+        else:
+            pl = row.find('span', {'class': 'pl'})
+            datetime = pl.text.split(':')[0].strip() if pl else None
+        price = row.find('span', {'class': 'result-price'})
+        where = row.find('span', {'class': 'result-hood'})
+        if where:
+            where = where.text.strip()[1:-1]  # remove ()
+        tags_span = row.find('span', {'class': 'result-tags'})
+        tags = tags_span.text if tags_span else ''
+
+        result = {'id': id,
+                  'repost_of': repost_of,
+                  'name': name,
+                  'url': url,
+                  # NOTE: Keeping 'datetime' for backwards
+                  # compatibility, use 'last_updated' instead.
+                  'datetime': datetime,
+                  'last_updated': datetime,
+                  'price': price.text if price else None,
+                  'where': where,
+                  'has_image': 'pic' in tags,
+                  'geotag': None}
+
+        if self.custom_result_fields:
+            self.customize_result(result, row)
+
+        if geotagged or include_details:
+            detail_soup = self.fetch_content(result['url'])
+            if geotagged:
+                self.geotag_result(result, detail_soup)
+            if include_details:
+                self.include_details(result, detail_soup)
+
+        return result
+
     def customize_result(self, result, html_row):
-        """ Add custom/delete/alter fields to result. """
+        """ Adds custom/delete/alter fields to result. """
         pass  # Override in subclass to add category-specific fields.
 
     def geotag_result(self, result, soup):
@@ -283,7 +294,7 @@ class CraigslistBase(object):
 
     def geotag_results(self, results, workers=8):
         """
-        Add (lat, lng) to each result. This process is done using N threads,
+        Adds (lat, lng) to each result. This process is done using N threads,
         where N is the amount of workers defined (default: 8).
         """
 
