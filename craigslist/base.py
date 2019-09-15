@@ -271,16 +271,26 @@ class CraigslistBase(object):
                     created = time.attrs['datetime'].replace('T', ' ')
                     result['created'] = created.rsplit(':', 1)[0]
 
+        # Add images' urls.
         image_tags = soup.find_all('img')
         # If there's more than one picture, the first one will be repeated.
         image_tags = image_tags[1:] if len(image_tags) > 1 else image_tags
-
         images = []
         for img in image_tags:
             img_link = img['src'].replace('50x50c', '600x450')
             images.append(img_link)
-
         result['images'] = images
+
+        # Add list of attributes as unparsed strings. These values can be
+        # later post-processed by the subclasses into structured values.
+        attrgroups = soup.find_all('p', {'class': 'attrgroup'})
+        attrs = []
+        for attrgroup in attrgroups:
+            for attr in attrgroup.find_all('span'):
+                attr_text = attr.text.strip()
+                if attr_text:
+                    attrs.append(attr_text)
+        result['attrs'] = attrs
 
     def fetch_content(self, url):
         response = requests_get(url, logger=self.logger)
