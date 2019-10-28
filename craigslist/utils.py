@@ -21,6 +21,7 @@ def requests_get(*args, **kwargs):
         return requests.get(*args, **kwargs)
     except RequestException as exc:
         if logger:
+            pass
             logger.warning('Request failed (%s). Retrying ...', exc)
         return requests.get(*args, **kwargs)
 

@@ -119,17 +119,6 @@ class CraigslistJobs(CraigslistBase):
     }
 
 
-class CraigslistPersonals(CraigslistBase):
-    """ Craigslist personals wrapper. """
-
-    default_category = 'ppp'
-
-    extra_filters = {
-        'min_age': {'url_key': 'min_pers_age', 'value': None},
-        'max_age': {'url_key': 'max_pers_age', 'value': None},
-    }
-
-
 class CraigslistResumes(CraigslistBase):
     """ Craigslist resumes wrapper. """
 
