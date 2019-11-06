@@ -45,7 +45,7 @@ Looking for a room in San Francisco?
 .. code:: python
 
     from craigslist import CraigslistHousing
-    cl_h = CraigslistHousing(site='sfbay', area='sfc', category='roo',
+    cl_h = CraigslistHousing(site='sfbay', area='sfc', category='room',
                              filters={'max_price': 1200, 'private_room': True})
 
     for result in cl_h.get_results(sort_by='newest', geotagged=True):
