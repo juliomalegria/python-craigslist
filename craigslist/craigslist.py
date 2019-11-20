@@ -48,6 +48,10 @@ class CraigslistForSale(CraigslistBase):
         'max_year': {'url_key': 'max_auto_year', 'value': None},
         'min_miles': {'url_key': 'min_auto_miles', 'value': None},
         'max_miles': {'url_key': 'max_auto_miles', 'value': None},
+        'min_engine_displacement': {
+            'url_key': 'min_engine_displacement_cc', 'value': None},
+        'max_engine_displacement': {
+            'url_key': 'max_engine_displacement_cc', 'value': None},
     }
 
 
