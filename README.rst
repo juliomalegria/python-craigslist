@@ -49,7 +49,7 @@ Looking for a room in San Francisco?
                              filters={'max_price': 1200, 'private_room': True})
 
     for result in cl_h.get_results(sort_by='newest', geotagged=True):
-        print result
+        print(result)
 
     {
         'id': u'4851150747',
@@ -73,7 +73,7 @@ Maybe an software engineering internship in Silicon Valley?
                           filters={'is_internship': True, 'employment_type': ['full-time', 'part-time']})
 
     for result in cl_j.get_results():
-        print result
+        print(result)
 
     {
         'id': u'5708651182',
@@ -96,7 +96,7 @@ Events with free food in New York?
     cl_e = CraigslistEvents(site='newyork', filters={'free': True, 'food': True})
 
     for result in cl_e.get_results(sort_by='newest', limit=5):
-        print result
+        print(result)
 
     {
         'id': u'4866178242',
