@@ -220,9 +220,6 @@ class CraigslistBase(object):
                   'has_image': 'pic' in tags,
                   'geotag': None}
 
-        if self.custom_result_fields:
-            self.customize_result(result, row)
-
         if geotagged or include_details:
             detail_soup = self.fetch_content(result['url'])
             if geotagged:
@@ -230,11 +227,16 @@ class CraigslistBase(object):
             if include_details:
                 self.include_details(result, detail_soup)
 
+        if self.custom_result_fields:
+            self.customize_result(result)
+
         return result
 
-    def customize_result(self, result, html_row):
+    def customize_result(self, result):
         """ Adds custom/delete/alter fields to result. """
-        pass  # Override in subclass to add category-specific fields.
+        # Override in subclass to add category-specific fields.
+        # FYI: `attrs` will only be presented if include_details was True.
+        pass
 
     def geotag_result(self, result, soup):
         """ Adds (lat, lng) to result. """
@@ -278,12 +280,15 @@ class CraigslistBase(object):
         image_tags = image_tags[1:] if len(image_tags) > 1 else image_tags
         images = []
         for img in image_tags:
+            if 'src' not in img:  # Some posts contain empty <img> tags.
+                continue
             img_link = img['src'].replace('50x50c', '600x450')
             images.append(img_link)
         result['images'] = images
 
-        # Add list of attributes as unparsed strings. These values can be
-        # later post-processed by the subclasses into structured values.
+        # Add list of attributes as unparsed strings. These values are then
+        # processed by `parse_attrs`, and are available to be post-processed
+        # by subclasses.
         attrgroups = soup.find_all('p', {'class': 'attrgroup'})
         attrs = []
         for attrgroup in attrgroups:
@@ -292,6 +297,30 @@ class CraigslistBase(object):
                 if attr_text:
                     attrs.append(attr_text)
         result['attrs'] = attrs
+        if attrs:
+            self.parse_attrs(result)
+
+    def parse_attrs(self, result):
+        """Parses raw attributes into structured fields in the result dict."""
+
+        # Parse binary fields first by checking their presence.
+        attrs = set(attr.lower() for attr in result['attrs'])
+        for key, options in iteritems(self.extra_filters):
+            if options['value'] != 1:
+                continue  # Filter is not binary
+            if options.get('attr', '') in attrs:
+                result[key] = True
+        # Values from list filters are sometimes shown as {filter}: {value}
+        # e.g. "transmission: automatic", although usually they are shown only
+        # with the {value}, e.g. "laundry in bldg". By stripping the content
+        # before the colon (if any) we reduce it to a single case.
+        attrs_after_colon = set(
+            attr.split(': ', 1)[-1] for attr in result['attrs'])
+        for key, options in iteritems(self.get_list_filters(self.url)):
+            for option in options['value']:
+                if option in attrs_after_colon:
+                    result[key] = option
+                    break
 
     def fetch_content(self, url):
         response = requests_get(url, logger=self.logger)
