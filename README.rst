@@ -30,7 +30,6 @@ Subclasses:
 * ``CraigslistCommunity`` (craigslist.org > community)
 * ``CraigslistHousing`` (craigslist.org > housing)
 * ``CraigslistJobs`` (craigslist.org > jobs)
-* ``CraigslistPersonals`` (craigslist.org > personals)
 * ``CraigslistForSale`` (craigslist.org > for sale)
 * ``CraigslistEvents`` (craigslist.org > event calendar)
 * ``CraigslistServices`` (craigslist.org > services)
