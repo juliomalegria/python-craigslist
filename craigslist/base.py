@@ -40,6 +40,7 @@ class CraigslistBase(object):
         'zip_code': {'url_key': 'postal', 'value': None},
     }
     extra_filters = {}
+    __list_filters = {}  # Cache for list filters requested by URL
 
     # Set to True to subclass defines the customize_results() method
     custom_result_fields = False
@@ -79,7 +80,7 @@ class CraigslistBase(object):
     def get_filters(self, filters):
         """Parses filters passed by the user into GET parameters."""
 
-        list_filters = get_list_filters(self.url)
+        list_filters = self.get_list_filters(self.url)
 
         # If a search has few results, results for "similar listings" will be
         # included. The solution is a bit counter-intuitive, but to force this
@@ -332,6 +333,12 @@ class CraigslistBase(object):
         return results
 
     @classmethod
+    def get_list_filters(cls, url):
+        if cls.__list_filters.get(url) is None:
+            cls.__list_filters[url] = get_list_filters(url)
+        return cls.__list_filters[url]
+
+    @classmethod
     def show_filters(cls, category=None):
         print('Base filters:')
         for key, options in iteritems(cls.base_filters):
@@ -345,7 +352,7 @@ class CraigslistBase(object):
             'site': cls.default_site,
             'category': category or cls.default_category,
         }
-        list_filters = get_list_filters(url)
+        list_filters = cls.get_list_filters(url)
         for key, options in iteritems(list_filters):
             value_as_str = ', '.join([repr(opt) for opt in options['value']])
             print('* %s = %s' % (key, value_as_str))
