@@ -218,7 +218,14 @@ class CraigslistBase(object):
                   'price': price.text if price else None,
                   'where': where,
                   'has_image': 'pic' in tags,
-                  'geotag': None}
+                  'geotag': None,
+                  # In very few cases, a posting will be included in the result
+                  # list but it has already been deleted (or it has been
+                  # deleted after the list was retrieved). In that case, this
+                  # field will be marked as True. If you want to be extra
+                  # careful, always check this field is False before using a
+                  # result.
+                  'deleted': False}
 
         if geotagged or include_details:
             detail_soup = self.fetch_content(result['url'])
@@ -256,6 +263,13 @@ class CraigslistBase(object):
         self.logger.debug('Adding details to result...')
 
         body = soup.find('section', id='postingbody')
+
+        if not body:
+            # This should only happen when the posting has been deleted by its
+            # author.
+            result['deleted'] = True
+            return
+
         # We need to massage the data a little bit because it might include
         # some inner elements that we want to ignore.
         body_text = (getattr(e, 'text', e) for e in body
