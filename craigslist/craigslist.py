@@ -101,7 +101,24 @@ class CraigslistForSale(CraigslistBase):
             'url_key': 'max_engine_displacement_cc', 'value': None},
         # bicycle types
         'bicycle_type': {
-            'url_key': 'bicycle_type', 'value': None},
+            'url_key': 'bicycle_type', 'value': {
+                                        1: 'bmx',
+                                        2: 'cargo/pedicab',
+                                        3: 'cruiser',
+                                        4: 'cyclocross',
+                                        5: 'folding',
+                                        6: 'hybrid/comfort',
+                                        7: 'kids',
+                                        8: 'mountain',
+                                        9: 'recumbent/trike',
+                                        10: 'road',
+                                        11: 'tandem',
+                                        12: 'track',
+                                        13: 'unicycle',
+                                        14: 'other',
+                                        15: 'gravel'
+                                    }
+        },
     }
 
     def customize_result(self, result):

@@ -387,10 +387,16 @@ class CraigslistBase(object):
         for key, options in iteritems(cls.base_filters):
             value_as_str = '...' if options['value'] is None else 'True/False'
             print('* %s = %s' % (key, value_as_str))
+
         print('Section specific filters:')
         for key, options in iteritems(cls.extra_filters):
-            value_as_str = '...' if options['value'] is None else 'True/False'
-            print('* %s = %s' % (key, value_as_str))
+            if (options['value'] is None):
+                print(f"* {key} = ...")
+            elif isinstance(options['value'], dict):
+                print(f"* {key} = {options['value']}")
+            else:
+                print(f"* {key} = True/False")
+
         url = cls.url_templates['no_area'] % {
             'site': cls.default_site,
             'category': category or cls.default_category,
