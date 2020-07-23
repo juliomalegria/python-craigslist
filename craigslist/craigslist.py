@@ -99,6 +99,9 @@ class CraigslistForSale(CraigslistBase):
             'url_key': 'min_engine_displacement_cc', 'value': None},
         'max_engine_displacement': {
             'url_key': 'max_engine_displacement_cc', 'value': None},
+        # bicycle types
+        'bicycle_type': {
+            'url_key': 'bicycle_type', 'value': None},
     }
 
     def customize_result(self, result):
