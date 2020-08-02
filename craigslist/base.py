@@ -294,10 +294,11 @@ class CraigslistBase(object):
         image_tags = image_tags[1:] if len(image_tags) > 1 else image_tags
         images = []
         for img in image_tags:
-            if 'src' not in img:  # Some posts contain empty <img> tags.
-                continue
-            img_link = img['src'].replace('50x50c', '600x450')
-            images.append(img_link)
+            try:
+                img_link = img['src'].replace('50x50c', '600x450')
+                images.append(img_link)
+            except KeyError:
+                continue  # Some posts contain empty <img> tags.
         result['images'] = images
 
         # Add list of attributes as unparsed strings. These values are then
