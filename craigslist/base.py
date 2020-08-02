@@ -250,10 +250,10 @@ class CraigslistBase(object):
 
         self.logger.debug('Geotagging result ...')
 
-        map = soup.find('div', {'id': 'map'})
-        if map:
-            result['geotag'] = (float(map.attrs['data-latitude']),
-                                float(map.attrs['data-longitude']))
+        map_ = soup.find('div', {'id': 'map'})
+        if map_:
+            result['geotag'] = (float(map_.attrs['data-latitude']),
+                                float(map_.attrs['data-longitude']))
 
         return result
 
@@ -313,6 +313,11 @@ class CraigslistBase(object):
         result['attrs'] = attrs
         if attrs:
             self.parse_attrs(result)
+
+        # If an address is included, add it to `address`.
+        mapaddress = soup.find('div', {'class': 'mapaddress'})
+        if mapaddress:
+            result['address'] = mapaddress.text
 
     def parse_attrs(self, result):
         """Parses raw attributes into structured fields in the result dict."""
