@@ -132,6 +132,27 @@ class CraigslistBase(object):
         sublinks = soup.find('ul', {'class': 'sublinks'})
         return sublinks and sublinks.find('a', text=area) is not None
 
+    def get_results_approx_count(self, soup=None):
+        """
+        Gets (approx) amount of results to be returned by `get_results`.
+
+        Note that this number could be not exactly the same as the actual
+        len of results returned (although from my tests usually within +/-10).
+        Also note that this will make an extra request to Craigslist (if `soup`
+        is not provided).
+        """
+
+        if soup is None:
+            response = requests_get(self.url, params=self.filters,
+                                    logger=self.logger)
+            self.logger.info('GET %s', response.url)
+            self.logger.info('Response code: %s', response.status_code)
+            response.raise_for_status()  # Something failed?
+            soup = bs(response.content)
+
+        totalcount = soup.find('span', {'class': 'totalcount'})
+        return int(totalcount.text) if totalcount else None
+
     def get_results(self, limit=None, start=0, sort_by=None, geotagged=False,
                     include_details=False):
         """
@@ -164,8 +185,7 @@ class CraigslistBase(object):
 
             soup = bs(response.content)
             if not total:
-                totalcount = soup.find('span', {'class': 'totalcount'})
-                total = int(totalcount.text) if totalcount else 0
+                total = self.get_results_approx_count(soup=soup)
 
             rows = soup.find('ul', {'class': 'rows'})
             for row in rows.find_all('li', {'class': 'result-row'},
@@ -173,7 +193,7 @@ class CraigslistBase(object):
                 if limit is not None and results_yielded >= limit:
                     break
                 self.logger.debug('Processing %s of %s results ...',
-                                  total_so_far + 1, total)
+                                  total_so_far + 1, total or '(undefined)')
 
                 yield self.process_row(row, geotagged, include_details)
 
