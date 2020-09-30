@@ -115,7 +115,7 @@ Events with free food in New York?
     }
     # ...
 
-Where to get `filters` from?
+Guide for where to get `filters` from?
 ----------------------------
 
 Every subclass has its own set of filters. To get a list of all the filters
