@@ -68,7 +68,7 @@ Looking for a room in San Francisco?
     }
     # ...
 
-Maybe an software engineering internship in Silicon Valley?
+Maybe a software engineering internship in Silicon Valley?
 
 .. code:: python
 
@@ -170,7 +170,7 @@ Where to get ``site`` and ``area`` from?
 
 When initializing any of the subclasses, you'll need to provide the ``site``, and optionall the ``area``, from where you want to query data.
 
-To get the right ``site``, follow these steps:
+To get the correct ``site``, follow these steps:
 
 1. Go to `craigslist.org/about/sites <https://www.craigslist.org/about/sites>`__.
 2. Find the country or city you're interested on, and click on it.
@@ -193,7 +193,7 @@ You can additionally provide a ``category`` when initializing any of the subclas
 
 .. image:: https://user-images.githubusercontent.com/14173022/46252889-3614ce00-c424-11e8-9bac-060c236b8b58.png
 
-Is there a limit for the numbers of results?
+Is there a limit for the number of results?
 --------------------------------------------
 
 Yes, Craigslist caps the results for any search to 3000.
