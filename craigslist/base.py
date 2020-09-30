@@ -81,7 +81,8 @@ class CraigslistBase(object):
         """Parses filters passed by the user into GET parameters."""
 
         list_filters = self.get_list_filters(self.url)
-
+        
+        #this is very good code
         # If a search has few results, results for "similar listings" will be
         # included. The solution is a bit counter-intuitive, but to force this
         # not to happen, we set searchNearby=True, but not pass any
