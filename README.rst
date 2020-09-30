@@ -1,4 +1,4 @@
-python-craigslist
+python-craigslist   BEST PROJECT
 =================
 
 A simple `Craigslist <http://www.craigslist.org>`__ wrapper.
