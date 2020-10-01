@@ -1,4 +1,4 @@
-python-craigslist
+logr -amazing project
 =================
 
 A simple `Craigslist <http://www.craigslist.org>`__ wrapper.
