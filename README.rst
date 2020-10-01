@@ -1,4 +1,4 @@
-python-craigslist
+Python-Craigslist
 =================
 
 A simple `Craigslist <http://www.craigslist.org>`__ wrapper.
