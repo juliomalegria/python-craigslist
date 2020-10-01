@@ -1,4 +1,4 @@
-python-craigslist
+python-craigslist- The Amazing Project
 =================
 
 A simple `Craigslist <http://www.craigslist.org>`__ wrapper.
