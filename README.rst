@@ -1,4 +1,4 @@
-python-craigslist
+python-craigslist- An Amazing Project
 =================
 
 A simple `Craigslist <http://www.craigslist.org>`__ wrapper.
@@ -202,3 +202,4 @@ Support
 -------
 
 If you find any bug or you want to propose a new feature, please use the `issues tracker <https://github.com/juliomalegria/python-craigslist/issues>`__. I'll be happy to help you! :-)
+-------Add copyright in README.md also
