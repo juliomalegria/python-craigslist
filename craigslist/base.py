@@ -97,7 +97,7 @@ class CraigslistBase(object):
                     parsed_filters[filter_['url_key']] = value
                 elif isinstance(filter_['value'], list):
                     valid_options = filter_['value']
-                    if not hasattr(value, '__iter__'):
+                    if not hasattr(value, '__iter__') or isinstance(value, str):
                         value = [value]  # Force to list
                     options = []
                     for opt in value:
