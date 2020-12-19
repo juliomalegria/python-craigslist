@@ -95,15 +95,15 @@ class CraigslistBase(object):
                            list_filters[key])
                 if filter_['value'] is None:
                     parsed_filters[filter_['url_key']] = value
-                elif isinstance(filter_['value'], list):
+                elif isinstance(filter_['value'], dict):
                     valid_options = filter_['value']
-                    if not hasattr(value, '__iter__'):
+                    if not hasattr(value, '__iter__') or isinstance(value, str):
                         value = [value]  # Force to list
                     options = []
                     for opt in value:
                         try:
-                            options.append(valid_options.index(opt) + 1)
-                        except ValueError:
+                            options.append(valid_options[opt])
+                        except KeyError:
                             self.logger.warning(
                                 "'%s' is not a valid option for %s"
                                 % (opt, key)
@@ -358,7 +358,7 @@ class CraigslistBase(object):
         attrs_after_colon = set(
             attr.split(': ', 1)[-1] for attr in result['attrs'])
         for key, options in iteritems(self.get_list_filters(self.url)):
-            for option in options['value']:
+            for option in options['value'].keys():
                 if option in attrs_after_colon:
                     result[key] = option
                     break
@@ -426,5 +426,5 @@ class CraigslistBase(object):
         }
         list_filters = cls.get_list_filters(url)
         for key, options in iteritems(list_filters):
-            value_as_str = ', '.join([repr(opt) for opt in options['value']])
+            value_as_str = ', '.join(repr(opt) for opt in options['value'].keys())
             print('* %s = %s' % (key, value_as_str))

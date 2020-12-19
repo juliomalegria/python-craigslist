@@ -56,6 +56,6 @@ def get_list_filters(url):
     for list_filter in soup.find_all('div', class_='search-attribute'):
         filter_key = list_filter.attrs['data-attr']
         filter_labels = list_filter.find_all('label')
-        options = [opt.text.strip() for opt in filter_labels]
+        options = {opt.text.strip(): opt.find('input').get('value') for opt in filter_labels}
         list_filters[filter_key] = {'url_key': filter_key, 'value': options}
     return list_filters
