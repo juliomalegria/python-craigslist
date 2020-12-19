@@ -102,8 +102,8 @@ class CraigslistBase(object):
                     options = []
                     for opt in value:
                         try:
-                            options.append(valid_options.get(opt))
-                        except ValueError:
+                            options.append(valid_options[opt])
+                        except KeyError:
                             self.logger.warning(
                                 "'%s' is not a valid option for %s"
                                 % (opt, key)
@@ -357,7 +357,7 @@ class CraigslistBase(object):
         attrs_after_colon = set(
             attr.split(': ', 1)[-1] for attr in result['attrs'])
         for key, options in iteritems(self.get_list_filters(self.url)):
-            for option in list(options['value'].keys()):
+            for option in options['value'].keys():
                 if option in attrs_after_colon:
                     result[key] = option
                     break
@@ -423,5 +423,5 @@ class CraigslistBase(object):
         }
         list_filters = cls.get_list_filters(url)
         for key, options in iteritems(list_filters):
-            value_as_str = ', '.join(repr(opt) for opt in list(options['value'].keys()))
+            value_as_str = ', '.join(repr(opt) for opt in options['value'].keys())
             print('* %s = %s' % (key, value_as_str))
