@@ -10,6 +10,13 @@ def bs(content):
     return BeautifulSoup(content, 'html.parser')
 
 
+def isiterable(var):
+    try:
+        return iter(var) and True
+    except TypeError:
+        return False
+
+
 def requests_get(*args, **kwargs):
     """
     Retries if a RequestException is raised (could be a connection error or
@@ -56,6 +63,7 @@ def get_list_filters(url):
     for list_filter in soup.find_all('div', class_='search-attribute'):
         filter_key = list_filter.attrs['data-attr']
         filter_labels = list_filter.find_all('label')
-        options = {opt.text.strip(): opt.find('input').get('value') for opt in filter_labels}
+        options = {opt.text.strip(): opt.find('input').get('value')
+                   for opt in filter_labels}
         list_filters[filter_key] = {'url_key': filter_key, 'value': options}
     return list_filters

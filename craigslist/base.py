@@ -12,9 +12,9 @@ except ImportError:
 from six import iteritems
 from six.moves import range
 
-from .utils import bs, requests_get, get_all_sites, get_list_filters
+from . import utils
 
-ALL_SITES = get_all_sites()  # All the Craiglist sites
+ALL_SITES = utils.get_all_sites()  # All the Craiglist sites
 RESULTS_PER_REQUEST = 100  # Craigslist returns 100 results per request
 
 
@@ -97,7 +97,7 @@ class CraigslistBase(object):
                     parsed_filters[filter_['url_key']] = value
                 elif isinstance(filter_['value'], dict):
                     valid_options = filter_['value']
-                    if not hasattr(value, '__iter__') or isinstance(value, str):
+                    if not utils.isiterable(value) or isinstance(value, str):
                         value = [value]  # Force to list
                     options = []
                     for opt in value:
@@ -126,9 +126,9 @@ class CraigslistBase(object):
 
     def is_valid_area(self, area):
         base_url = self.url_templates['base']
-        response = requests_get(base_url % {'site': self.site},
-                                logger=self.logger)
-        soup = bs(response.content)
+        response = utils.requests_get(base_url % {'site': self.site},
+                                      logger=self.logger)
+        soup = utils.bs(response.content)
         sublinks = soup.find('ul', {'class': 'sublinks'})
         return sublinks and sublinks.find('a', text=area) is not None
 
@@ -143,12 +143,12 @@ class CraigslistBase(object):
         """
 
         if soup is None:
-            response = requests_get(self.url, params=self.filters,
-                                    logger=self.logger)
+            response = utils.requests_get(self.url, params=self.filters,
+                                          logger=self.logger)
             self.logger.info('GET %s', response.url)
             self.logger.info('Response code: %s', response.status_code)
             response.raise_for_status()  # Something failed?
-            soup = bs(response.content)
+            soup = utils.bs(response.content)
 
         totalcount = soup.find('span', {'class': 'totalcount'})
         return int(totalcount.text) if totalcount else None
@@ -177,13 +177,13 @@ class CraigslistBase(object):
 
         while True:
             self.filters['s'] = start
-            response = requests_get(self.url, params=self.filters,
-                                    logger=self.logger)
+            response = utils.requests_get(self.url, params=self.filters,
+                                          logger=self.logger)
             self.logger.info('GET %s', response.url)
             self.logger.info('Response code: %s', response.status_code)
             response.raise_for_status()  # Something failed?
 
-            soup = bs(response.content)
+            soup = utils.bs(response.content)
             if not total:
                 total = self.get_results_approx_count(soup=soup)
 
@@ -364,12 +364,12 @@ class CraigslistBase(object):
                     break
 
     def fetch_content(self, url):
-        response = requests_get(url, logger=self.logger)
+        response = utils.requests_get(url, logger=self.logger)
         self.logger.info('GET %s', response.url)
         self.logger.info('Response code: %s', response.status_code)
 
         if response.ok:
-            return bs(response.content)
+            return utils.bs(response.content)
 
         self.logger.warning("GET %s returned not OK response code: %s "
                             "(skipping)", url, response.status_code)
@@ -407,7 +407,7 @@ class CraigslistBase(object):
     @classmethod
     def get_list_filters(cls, url):
         if cls.__list_filters.get(url) is None:
-            cls.__list_filters[url] = get_list_filters(url)
+            cls.__list_filters[url] = utils.get_list_filters(url)
         return cls.__list_filters[url]
 
     @classmethod
@@ -426,5 +426,6 @@ class CraigslistBase(object):
         }
         list_filters = cls.get_list_filters(url)
         for key, options in iteritems(list_filters):
-            value_as_str = ', '.join(repr(opt) for opt in options['value'].keys())
+            value_as_str = ', '.join(
+                repr(opt) for opt in options['value'].keys())
             print('* %s = %s' % (key, value_as_str))
