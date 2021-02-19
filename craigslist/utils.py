@@ -4,6 +4,7 @@ from requests.exceptions import RequestException
 
 ALL_SITES_URL = 'http://www.craigslist.org/about/sites'
 SITE_URL = 'http://%s.craigslist.org'
+USER_AGENT = 'Mozilla/5.0'
 
 
 def bs(content):
@@ -24,6 +25,9 @@ def requests_get(*args, **kwargs):
     """
 
     logger = kwargs.pop('logger', None)
+    # Set default User-Agent header if not defined.
+    kwargs.setdefault('headers', {}).setdefault('User-Agent', USER_AGENT)
+
     try:
         return requests.get(*args, **kwargs)
     except RequestException as exc:
