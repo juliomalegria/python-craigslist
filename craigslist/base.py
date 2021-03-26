@@ -411,12 +411,35 @@ class CraigslistBase(object):
         return cls.__list_filters[url]
 
     @classmethod
+    def show_categories(cls):
+        """Gets valid categories for given Craigslist class."""
+        url = cls.url_templates["no_area"] % {
+            "site": cls.default_site,
+            "category": cls.default_category,
+        }
+        response = utils.requests_get(url)
+        soup = utils.bs(response.content)
+        cats = [
+            input.get("data-abb")
+            for input in soup.find_all("input", {"class": "catcheck multi_checkbox"})
+        ]
+        cats_title = [a.contents[0] for a in soup.find_all("a", {"class": "category"})]
+
+        print("%s categories:" % cls.__name__)
+        for cat, cat_title in iteritems(dict(zip(cats, cats_title))):
+            print("* %s = %s" % (cat, cat_title))
+
+    @classmethod
     def show_filters(cls, category=None):
         print('Base filters:')
         for key, options in iteritems(cls.base_filters):
             value_as_str = '...' if options['value'] is None else 'True/False'
             print('* %s = %s' % (key, value_as_str))
-        print('Section specific filters:')
+
+        if category is None:
+            print("\n%s filters:" % cls.__name__)
+        else:
+            print("\n%s filters with category '%s':" % (cls.__name__, category))
         for key, options in iteritems(cls.extra_filters):
             value_as_str = '...' if options['value'] is None else 'True/False'
             print('* %s = %s' % (key, value_as_str))
