@@ -127,43 +127,52 @@ supported by a specific subclass, use the ``.show_filters()`` class-method:
    >>> CraigslistJobs.show_filters()
 
    Base filters:
-   * posted_today = True/False
    * query = ...
    * search_titles = True/False
    * has_image = True/False
-   Section specific filters:
+   * posted_today = True/False
+   * bundle_duplicates = True/False
+   * search_distance = ...
+   * zip_code = ...
+   
+   CraigslistJobs filters:
    * is_internship = True/False
-   * is_telecommuting = True/False
-   * is_contract = True/False
-   * is_parttime = True/False
    * is_nonprofit = True/False
+   * is_telecommuting = True/False
    * employment_type = u'full-time', u'part-time', u'contract', u"employee's choice"
+
 
    >>> CraigslistForSale.show_filters(category='cta')
 
    Base filters:
-   * posted_today = True/False
    * query = ...
    * search_titles = True/False
    * has_image = True/False
-   Section specific filters:
-   * min_year = ...
-   * model = ...
+   * posted_today = True/False
+   * bundle_duplicates = True/False
+   * search_distance = ...
+   * zip_code = ...
+   
+   CraigslistForSale filters with category 'cta':
    * min_price = ...
-   * max_miles = ...
-   * make = ...
    * max_price = ...
-   * min_miles = ...
+   * make = ...
+   * model = ...
+   * min_year = ...
    * max_year = ...
-   * auto_title_status = u'clean', u'salvage', u'rebuilt', u'parts only', u'lien', u'missing'
-   * auto_transmission = u'manual', u'automatic', u'other'
+   * min_miles = ...
+   * max_miles = ...
+   * min_engine_displacement = ...
+   * max_engine_displacement = ...
+   * condition = u'new', u'like new', u'excellent', u'good', u'fair', u'salvage'
+   * auto_cylinders = u'3 cylinders', u'4 cylinders', u'5 cylinders', u'6 cylinders', u'8 cylinders', u'10 cylinders', u'12 cylinders', u'other'
+   * auto_drivetrain = u'fwd', u'rwd', u'4wd'
    * auto_fuel_type = u'gas', u'diesel', u'hybrid', u'electric', u'other'
    * auto_paint = u'black', u'blue', u'brown', u'green', u'grey', u'orange', u'purple', u'red', u'silver', u'white', u'yellow', u'custom'
-   * auto_bodytype = u'bus', u'convertible', u'coupe', u'hatchback', u'mini-van', u'offroad', u'pickup', u'sedan', u'truck', u'SUV', u'wagon', u'van', u'other'
-   * auto_drivetrain = u'fwd', u'rwd', u'4wd'
    * auto_size = u'compact', u'full-size', u'mid-size', u'sub-compact'
-   * auto_cylinders = u'3 cylinders', u'4 cylinders', u'5 cylinders', u'6 cylinders', u'8 cylinders', u'10 cylinders', u'12 cylinders', u'other'
-   * condition = u'new', u'like new', u'excellent', u'good', u'fair', u'salvage'
+   * auto_title_status = u'clean', u'salvage', u'rebuilt', u'parts only', u'lien', u'missing'
+   * auto_transmission = u'manual', u'automatic', u'other'
+   * auto_bodytype = u'bus', u'convertible', u'coupe', u'hatchback', u'mini-van', u'offroad', u'pickup', u'sedan', u'truck', u'SUV', u'wagon', u'van', u'other'
 
 Where to get ``site`` and ``area`` from?
 ----------------------------------------
@@ -185,13 +194,36 @@ Click on the one you're interested, and you'll be redirected to ``<site>.craigsl
 Where to get ``category`` from?
 -------------------------------
 
-You can additionally provide a ``category`` when initializing any of the subclasses. To obtain the code of this ``category``, follow these steps:
+You can additionally provide a ``category`` when initializing any of the subclasses. To get a list of all the categories
+supported by a specific subclass, use the ``.show_categories()`` class-method:
 
-1. Go to ``<site>.craigslist.org`` or just `craigslist.org <https://www.craigslist.org>`__ (you'll be directed to the last used ``site``).
-2. You'll see a list of categories and subcategories (see image below).
-3. Click on the interested subcategory. You'll be redirected to the search view for that subcategory. The URL you were redirected will end with ``/search/<category>``. This would be the code for your category.
+.. code:: python
+    
+    >>> from craigslist import CraigslistServices
+    >>> CraigslistServices.show_categories()
 
-.. image:: https://user-images.githubusercontent.com/14173022/46252889-3614ce00-c424-11e8-9bac-060c236b8b58.png
+    CraigslistServices categories:  
+    * aos = automotive services
+    * bts = beauty services
+    * cms = cell phone / mobile services
+    * cps = computer services
+    * crs = creative services
+    * cys = cycle services
+    * evs = event services
+    * fgs = farm & garden services
+    * fns = financial services
+    * hws = health/wellness services
+    * hss = household services
+    * lbs = labor / hauling / moving
+    * lgs = legal services
+    * lss = lessons & tutoring
+    * mas = marine services
+    * pas = pet services
+    * rts = real estate services
+    * sks = skilled trade services
+    * biz = small biz ads
+    * trv = travel/vacation services
+    * wet = writing / editing / translation
 
 Is there a limit for the number of results?
 --------------------------------------------
