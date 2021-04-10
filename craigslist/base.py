@@ -438,7 +438,7 @@ class CraigslistBase(object):
         if category is None:
             print("\n%s filters:" % cls.__name__)
         else:
-            print("\n%s filters with category '%s':" % (cls.__name__, category))
+            print("\n%s filters for category '%s':" % (cls.__name__, category))
         for key, options in iteritems(cls.extra_filters):
             value_as_str = '...' if options['value'] is None else 'True/False'
             print('* %s = %s' % (key, value_as_str))
