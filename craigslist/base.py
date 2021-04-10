@@ -425,7 +425,7 @@ class CraigslistBase(object):
         cats_title = [a.contents[0] for a in soup.find_all("a", {"class": "category"})]
 
         print("%s categories:" % cls.__name__)
-        for cat, cat_title in iteritems(dict(zip(cats, cats_title))):
+        for cat, cat_title in sorted(zip(cats, cats_title), key=lambda item: item[1]):
             print("* %s = %s" % (cat, cat_title))
 
     @classmethod
@@ -438,7 +438,7 @@ class CraigslistBase(object):
         if category is None:
             print("\n%s filters:" % cls.__name__)
         else:
-            print("\n%s filters with category '%s':" % (cls.__name__, category))
+            print("\n%s filters for category '%s':" % (cls.__name__, category))
         for key, options in iteritems(cls.extra_filters):
             value_as_str = '...' if options['value'] is None else 'True/False'
             print('* %s = %s' % (key, value_as_str))
