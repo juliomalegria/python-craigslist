@@ -418,15 +418,15 @@ class CraigslistBase(object):
         }
         response = utils.requests_get(url)
         soup = utils.bs(response.content)
-        cats = [
-            input.get("data-abb")
-            for input in soup.find_all("input", {"class": "catcheck multi_checkbox"})
-        ]
-        cats_title = [a.contents[0] for a in soup.find_all("a", {"class": "category"})]
+
+        cat_html = soup.find_all("input", {"class": "catcheck multi_checkbox"})
+        cat_ids = [html.get('data-abb') for html in cat_html]
+        cat_html = soup.find_all("a", {"class": "category"})
+        cat_names = [html.contents[0] for html in cat_html]
 
         print("%s categories:" % cls.__name__)
-        for cat, cat_title in sorted(zip(cats, cats_title), key=lambda item: item[1]):
-            print("* %s = %s" % (cat, cat_title))
+        for cat_name, cat_id in sorted(zip(cat_names, cat_ids)):
+            print("* %s = %s" % (cat_id, cat_name))
 
     @classmethod
     def show_filters(cls, category=None):
