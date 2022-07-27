@@ -370,6 +370,8 @@ class CraigslistBase(object):
 
         if response.ok:
             return utils.bs(response.content)
+        elif response.status_code == 404:
+            return None
 
         self.logger.warning("GET %s returned not OK response code: %s "
                             "(skipping)", url, response.status_code)
