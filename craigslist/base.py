@@ -126,8 +126,7 @@ class CraigslistBase(object):
 
     def is_valid_area(self, area):
         base_url = self.url_templates['base']
-        response = utils.requests_get(base_url % {'site': self.site},
-                                      logger=self.logger)
+        response = utils.requests_get(base_url % {'site': self.site})
         soup = utils.bs(response.content)
         sublinks = soup.find('ul', {'class': 'sublinks'})
         return sublinks and sublinks.find('a', text=area) is not None
@@ -143,8 +142,7 @@ class CraigslistBase(object):
         """
 
         if soup is None:
-            response = utils.requests_get(self.url, params=self.filters,
-                                          logger=self.logger)
+            response = utils.requests_get(self.url, params=self.filters)
             self.logger.info('GET %s', response.url)
             self.logger.info('Response code: %s', response.status_code)
             response.raise_for_status()  # Something failed?
@@ -177,8 +175,7 @@ class CraigslistBase(object):
 
         while True:
             self.filters['s'] = start
-            response = utils.requests_get(self.url, params=self.filters,
-                                          logger=self.logger)
+            response = utils.requests_get(self.url, params=self.filters)
             self.logger.info('GET %s', response.url)
             self.logger.info('Response code: %s', response.status_code)
             response.raise_for_status()  # Something failed?
@@ -364,7 +361,7 @@ class CraigslistBase(object):
                     break
 
     def fetch_content(self, url):
-        response = utils.requests_get(url, logger=self.logger)
+        response = utils.requests_get(url)
         self.logger.info('GET %s', response.url)
         self.logger.info('Response code: %s', response.status_code)
 
