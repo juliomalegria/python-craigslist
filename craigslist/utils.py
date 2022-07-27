@@ -7,6 +7,11 @@ SITE_URL = 'http://%s.craigslist.org'
 USER_AGENT = 'Mozilla/5.0'
 
 
+session = requests.Session()
+retries = requests.adapters.Retry(total=5, backoff_factor=0.1)
+session.mount('http://', requests.adapters.HTTPAdapter(max_retries=retries))
+
+
 def bs(content):
     return BeautifulSoup(content, 'html.parser')
 
@@ -28,16 +33,11 @@ def requests_get(*args, **kwargs):
     # Set default User-Agent header if not defined.
     kwargs.setdefault('headers', {}).setdefault('User-Agent', USER_AGENT)
 
-    try:
-        return requests.get(*args, **kwargs)
-    except RequestException as exc:
-        if logger:
-            logger.warning('Request failed (%s). Retrying ...', exc)
-        return requests.get(*args, **kwargs)
+    return session.get(*args, **kwargs)
 
 
 def get_all_sites():
-    response = requests.get(ALL_SITES_URL)
+    response = requests_get(ALL_SITES_URL)
     response.raise_for_status()  # Something failed?
     soup = BeautifulSoup(response.content, 'html.parser')
     sites = set()
@@ -52,7 +52,7 @@ def get_all_sites():
 
 
 def get_all_areas(site):
-    response = requests.get(SITE_URL % site)
+    response = requests_get(SITE_URL % site)
     response.raise_for_status()  # Something failed?
     soup = BeautifulSoup(response.content, 'html.parser')
     raw = soup.select('ul.sublinks li a')
