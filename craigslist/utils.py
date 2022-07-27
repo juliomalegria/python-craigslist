@@ -29,7 +29,6 @@ def requests_get(*args, **kwargs):
     a timeout).
     """
 
-    logger = kwargs.pop('logger', None)
     # Set default User-Agent header if not defined.
     kwargs.setdefault('headers', {}).setdefault('User-Agent', USER_AGENT)
 
