@@ -49,7 +49,7 @@ class CraigslistBase(object):
         'newest': 'date',
         'price_asc': 'priceasc',
         'price_desc': 'pricedsc',
-        'oldest':'dateoldest',
+        'oldest': 'dateoldest',
     }
 
     def __init__(self, site=None, area=None, category=None, filters=None,
