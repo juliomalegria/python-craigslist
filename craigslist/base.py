@@ -49,6 +49,7 @@ class CraigslistBase(object):
         'newest': 'date',
         'price_asc': 'priceasc',
         'price_desc': 'pricedsc',
+        'oldest': 'dateoldest',
     }
 
     def __init__(self, site=None, area=None, category=None, filters=None,
@@ -167,7 +168,7 @@ class CraigslistBase(object):
                 self.filters['sort'] = self.sort_by_options[sort_by]
             except KeyError:
                 msg = ("'%s' is not a valid sort_by option, "
-                       "use: 'newest', 'price_asc' or 'price_desc'" % sort_by)
+                       "use: 'newest','oldest', 'price_asc' or 'price_desc'" % sort_by)
                 self.logger.error(msg)
                 raise ValueError(msg)
 
